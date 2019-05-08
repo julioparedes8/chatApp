@@ -1,2 +1,2 @@
 # chatApp
-Aplicaíón móvil con chat y notificaciones
+Aplicacíón móvil con chat y notificaciones
