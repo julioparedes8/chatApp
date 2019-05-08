@@ -1,2 +1,7 @@
 # chatApp
-Aplicacíón móvil con chat y notificaciones
+Aplicacíón móvil desarollada con react-native
+Funcionalidades:
+-Login
+-Alertas
+-Notificaciones
+-Chat
