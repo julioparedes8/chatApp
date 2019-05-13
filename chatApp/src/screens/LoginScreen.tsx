@@ -18,7 +18,7 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
   constructor(props: Readonly<LoginScreenProps>){
     super(props);
     this.state = {
-      hidden:false,
+      hidden:true,
       usuario:'',
       password:'',
     }
@@ -51,7 +51,7 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
         type:'success',
         duration:3000
       })
-      this.props.navigation.navigate("Home")
+      this.props.navigation.navigate("Chat")
     }else if(status==400){
       Toast.show({
         text: mensaje,

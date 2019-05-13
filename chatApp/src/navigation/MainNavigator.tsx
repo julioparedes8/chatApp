@@ -1,13 +1,38 @@
-import { createSwitchNavigator, createStackNavigator, createAppContainer } from 'react-navigation';
+import { createSwitchNavigator, createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator } from 'react-navigation';
 import LoginScreen from '../screens/LoginScreen';
-import DrawerNavigator from './DrawerNavigator';
+import ChatScreen from '../screens/ChatScreen';
+import AvisoScreen from '../screens/AvisoScreen';
+import AgendaScreen from '../screens/AgendaScreen';
+import AlertaScreen from '../screens/AlertaScreen';
+//import DrawerNavigator from './DrawerNavigator';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
 // goes here.
-
-const AppStack = DrawerNavigator;
+const MainNavigator= createStackNavigator(
+  {
+      Chat:{
+          screen: ChatScreen
+      },
+      Aviso:{
+          screen: AvisoScreen
+      },
+      Agenda:{
+          screen: AgendaScreen
+      },
+      Alerta:{
+          screen: AlertaScreen
+      },
+      Login:{
+          screen: LoginScreen
+      }
+      
+  },
+  {
+    headerMode: 'none'
+  }
+)
+const AppStack = MainNavigator;
 const AuthStack = createStackNavigator({ Login: LoginScreen });
-
 export default createAppContainer(createSwitchNavigator(
   {
     //AuthLoading: AuthLoadingScreen,
