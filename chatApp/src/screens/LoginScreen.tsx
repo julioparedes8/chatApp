@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList,ImageBackground} from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 import api from '../api';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
@@ -14,6 +15,7 @@ interface state{
     password?: string,
 }
 let API = new api();
+let token=""
 class LoginScreen extends React.Component<LoginScreenProps,state> {
   constructor(props: Readonly<LoginScreenProps>){
     super(props);
@@ -36,9 +38,10 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
     .then(response => {
     const parsedJSON = response;
     const login: Login[] = parsedJSON as Login[];
-    console.log('MESSAGE: ' +login.message);
-    console.log('STATUS: ' +login.status);
-    console.log('TOKEN: ' +login.resp);
+    //console.log('MESSAGE: ' +login.message);
+    //console.log('STATUS: ' +login.status);
+    //console.log('TOKEN: ' +login.resp);
+    token=login.resp
     this.mensajeShow(login.message,login.status)
     })
     .catch(error => console.log(error))
@@ -51,6 +54,8 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
         type:'success',
         duration:3000
       })
+      this.setToken()
+      this.setFooterActive()
       this.props.navigation.navigate("Chat")
     }else if(status==400){
       Toast.show({
@@ -59,6 +64,24 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
         type:'danger',
         duration:3000
       })
+    }
+  }
+  setToken=async ()=>{
+    try {
+      await AsyncStorage.setItem('Token', JSON.stringify(token))
+      const tkn = await AsyncStorage.getItem('Token')
+      console.log(tkn)
+    } catch (e) {
+      // saving error
+    }
+  }
+  setFooterActive=async ()=>{
+    try {
+      await AsyncStorage.setItem('activeButton', JSON.stringify ('chat'))
+      const tkn = await AsyncStorage.getItem('activeButton')
+      console.log(tkn)
+    } catch (e) {
+      // saving error
     }
   }
   render() {

@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {View,StyleSheet,FlatList} from 'react-native'
+import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
 import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 export interface ChatScreenProps {
-    navigation: NavigationScreenProp<any,any>
+    navigation: NavigationScreenProp<any,any>,
   };
 interface state {
     loading?: boolean;
@@ -53,7 +53,7 @@ class ChatScreen extends React.Component<ChatScreenProps, state> {
         }
         return (
             <Container>
-            <Header>
+            <Header  style={{backgroundColor:"#5197F9"}}>
                 <Body>
                   <Title>Chats</Title>
                 </Body>

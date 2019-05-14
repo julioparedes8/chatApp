@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View,StyleSheet,FlatList} from 'react-native'
+import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
 import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
@@ -20,13 +20,22 @@ class AvisoScreen extends React.Component<AvisoScreenProps, state> {
     }
     componentDidMount() {
       this.setState({loading:true})
+      this.setFooterActive()
       //llamar la funcion de la api y dependiendo del objeto se le asigna la interface
+    }
+    setFooterActive=async ()=>{
+      try {
+        await AsyncStorage.mergeItem('activeButton', JSON.stringify('aviso'))
+        console.log("cambio activo aviso")
+      } catch (e) {
+        // saving error
+      }
     }
     render(){
         if(this.state.loading){
             return (
               <Container>
-              <Header>
+              <Header  style={{backgroundColor:"#5197F9"}}>
                 <Body>
                   <Title>Avisos</Title>
                 </Body>
@@ -53,7 +62,7 @@ class AvisoScreen extends React.Component<AvisoScreenProps, state> {
         }
         return (
             <Container>
-            <Header>
+            <Header  style={{backgroundColor:"#5197F9"}}>
                 <Body>
                   <Title>Avisos</Title>
                 </Body>
