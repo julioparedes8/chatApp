@@ -11,8 +11,9 @@ import React, {Component} from 'react';
 import { Root } from "native-base";
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import HomeScreen from './src/screens/ChatScreen'
-import DrawerNavigator from './src/navigation/DrawerNavigator'
+//import DrawerNavigator from './src/navigation/DrawerNavigator'
 import MainNavigator from './src/navigation/MainNavigator';
+import FooterComponent from './src/components/Footer';
 
 interface Props {}
 export default class App extends Component<Props> {

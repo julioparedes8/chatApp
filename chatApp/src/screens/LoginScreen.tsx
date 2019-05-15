@@ -5,7 +5,7 @@ import api from '../api';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import { Login } from '../entidades/login';
-export interface LoginScreenProps{
+export interface Props{
     navigation: NavigationScreenProp<any,any>
 }
 interface state{
@@ -16,8 +16,8 @@ interface state{
 }
 let API = new api();
 let token=""
-class LoginScreen extends React.Component<LoginScreenProps,state> {
-  constructor(props: Readonly<LoginScreenProps>){
+class LoginScreen extends React.Component<Props,state> {
+  constructor(props: Readonly<Props>){
     super(props);
     this.state = {
       hidden:true,
@@ -55,8 +55,7 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
         duration:3000
       })
       this.setToken()
-      this.setFooterActive()
-      this.props.navigation.navigate("Chat")
+      this.props.navigation.navigate("Home")
     }else if(status==400){
       Toast.show({
         text: mensaje,
@@ -70,15 +69,6 @@ class LoginScreen extends React.Component<LoginScreenProps,state> {
     try {
       await AsyncStorage.setItem('Token', JSON.stringify(token))
       const tkn = await AsyncStorage.getItem('Token')
-      console.log(tkn)
-    } catch (e) {
-      // saving error
-    }
-  }
-  setFooterActive=async ()=>{
-    try {
-      await AsyncStorage.setItem('activeButton', JSON.stringify ('chat'))
-      const tkn = await AsyncStorage.getItem('activeButton')
       console.log(tkn)
     } catch (e) {
       // saving error

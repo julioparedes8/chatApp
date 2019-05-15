@@ -3,6 +3,7 @@ import LoginScreen from '../screens/LoginScreen';
 import ChatScreen from '../screens/ChatScreen';
 import AvisoScreen from '../screens/AvisoScreen';
 import AgendaScreen from '../screens/AgendaScreen';
+import HomeScreen from '../screens/HomeScreen';
 import AlertaScreen from '../screens/AlertaScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
@@ -10,6 +11,9 @@ import AlertaScreen from '../screens/AlertaScreen';
 // goes here.
 const MainNavigator= createStackNavigator(
   {
+      Home:{
+          screen: HomeScreen
+      },
       Chat:{
           screen: ChatScreen
       },
@@ -24,7 +28,7 @@ const MainNavigator= createStackNavigator(
       },
       Login:{
           screen: LoginScreen
-      }
+      },
       
   },
   {
