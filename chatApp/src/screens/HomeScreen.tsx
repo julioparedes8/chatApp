@@ -24,6 +24,17 @@ class HomeScreen extends React.Component<Props,State> {
   switchScreen(index:number) {
     this.setState({index: index})
   }
+  cerrarSesion=()=>{
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Seguro que deseas cerrar sesión?',
+      [
+        {text: 'Si', onPress: () => this.props.navigation.navigate("Login")},
+        {text: 'No', onPress: () =>'cancelar'},
+      ],
+      {cancelable: false},
+    );
+  }
   render(){
     let AppComponent = null;
     let nombre= '';
@@ -42,14 +53,23 @@ class HomeScreen extends React.Component<Props,State> {
     }           
     return (
       <Container>
-        <Header style={{backgroundColor:"#5197F9"}}>
-          <Body>
-            <Title>{nombre}</Title>
+        <Header style={{backgroundColor:"#70CCF6"}}>
+        <Left style={{ flex:1}}>
+            {this.state.index==3 && 
+              <Button
+                transparent
+                  >
+                <Icon type="Entypo" name="new-message" />
+              </Button>
+            } 
+          </Left>
+          <Body style={{ flex:1}}>
+            <Title  style={{ alignSelf: 'center'}}>{nombre}</Title>
           </Body>
-          <Right>
+          <Right style={{ flex:1}}>
              <Button
                 transparent
-                onPress={()=>this.props.navigation.navigate("Login")}>
+                onPress={()=>this.cerrarSesion()}>
                 <Icon type="SimpleLineIcons" name="logout" />
               </Button>
           </Right>
@@ -58,22 +78,22 @@ class HomeScreen extends React.Component<Props,State> {
           <AppComponent/>
         </Content>
         <Footer>
-          <FooterTab style={{backgroundColor:"#5197F9"}}>
+          <FooterTab style={{backgroundColor:"#70CCF6", tabActiveBgColor: "#E8EAED"}}>
             <Button vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
-              <Icon name="ios-alarm" />
-              <Text>Alertas</Text>
+              <Icon name="ios-alarm" style={{color:"white"}}/>
+              <Text style={{color:"white"}}>Alertas</Text>
             </Button>
             <Button vertical  onPress={() => this.switchScreen(2) } active={this.state.index === 2}>
-              <Icon name="md-notifications"/>
-              <Text>Avisos</Text>
+              <Icon name="md-notifications" style={{color:"white"}}/>
+              <Text style={{color:"white"}}>Avisos</Text>
             </Button>
             <Button vertical onPress={() => this.switchScreen(3) } active={this.state.index === 3}>
-              <Icon name="ios-chatbubbles" />
-              <Text>Chats</Text>
+              <Icon name="ios-chatbubbles" style={{color:"white"}}/>
+              <Text style={{color:"white"}}>Chats</Text>
             </Button>
             <Button vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
-              <Icon name="ios-calendar" />
-              <Text>Agenda</Text>
+              <Icon name="ios-calendar" style={{color:"white"}}/>
+              <Text style={{color:"white"}}>Agenda</Text>
             </Button>
           </FooterTab>
           </Footer>
@@ -81,4 +101,9 @@ class HomeScreen extends React.Component<Props,State> {
       )
     }
 }
+const styles = StyleSheet.create({
+  header: {
+      flex:1
+  }
+})
   export default HomeScreen;

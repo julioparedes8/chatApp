@@ -17,7 +17,7 @@ export default class FooterComponent extends React.Component<Props,State>{
     render(){
         return (
             <Footer>
-            <FooterTab style={{backgroundColor:"#5197F9"}}>
+            <FooterTab >
                 <Button vertical onPress={()=> this.setState({activeButton:'alerta'})} active={this.state.activeButton === 'alerta'}>
                   <Icon name="ios-alarm" />
                   <Text>Alertas</Text>

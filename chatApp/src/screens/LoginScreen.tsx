@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View,StyleSheet,FlatList,ImageBackground} from 'react-native'
+import {View,StyleSheet,FlatList,ImageBackground, Alert} from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../api';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
@@ -13,6 +13,7 @@ interface state{
     loading?: boolean;
     usuario?: string;
     password?: string,
+    modal?: boolean,
 }
 let API = new api();
 let token=""
@@ -23,8 +24,12 @@ class LoginScreen extends React.Component<Props,state> {
       hidden:true,
       usuario:'',
       password:'',
+      modal:false
     }
   }
+  toggleModal = () => {
+    this.setState({ modal: !this.state.modal });
+  };
   ocultarPress = () =>{
     this.setState({ 
       hidden: !this.state.hidden 
@@ -48,22 +53,28 @@ class LoginScreen extends React.Component<Props,state> {
   }
   mensajeShow = (mensaje:string,status:number)=>{
     if (status==200){
-      Toast.show({
-        text: "Bienvenido",
-        buttonText: 'Okay',
-        type:'success',
-        duration:3000
-      })
-      this.setToken()
-      this.props.navigation.navigate("Home")
+      Alert.alert(
+        'Inicio de Sesión',
+        'Bienvenido',
+        [
+          {text: 'OK', onPress: () => this.loginCorrecto()},
+        ],
+        {cancelable: false},
+      );
     }else if(status==400){
-      Toast.show({
-        text: mensaje,
-        buttonText: 'Okay',
-        type:'danger',
-        duration:3000
-      })
+      Alert.alert(
+        'Inicio de Sesión',
+        mensaje,
+        [
+          {text: 'OK', onPress: () => 'cerrar'},
+        ],
+        {cancelable: false},
+      );
     }
+  }
+  loginCorrecto=()=>{
+    this.setToken()
+    this.props.navigation.navigate("Home")
   }
   setToken=async ()=>{
     try {
@@ -82,7 +93,7 @@ class LoginScreen extends React.Component<Props,state> {
           <Content padder>
             <Form>
               <View>
-                <Text style={styles.txtLogin}>INICIO DE SESÍON</Text>
+                <Text style={styles.txtLogin}>INICIO DE SESIÓN</Text>
               </View>
               <Item rounded style={{ margin: 15, marginTop: 250,backgroundColor:'#EBF1F3' }}>
                 <Icon name='person' style={styles.icon}/>
@@ -95,7 +106,7 @@ class LoginScreen extends React.Component<Props,state> {
               </Item>
             </Form>
             <Button rounded block info  style={styles.button} onPress={this.sesionPress}>
-              <Text>Iniciar Sesíon</Text>
+              <Text>Iniciar Sesión</Text>
             </Button>
           </Content>
    // </ImageBackground>
@@ -120,7 +131,7 @@ const styles = StyleSheet.create({
   button:{
     margin: 60, 
     marginTop: 50,
-    backgroundColor:'#5197F9'
+    backgroundColor:'#70CCF6'
   },
   txtLogin:{
     position: 'absolute',
@@ -129,7 +140,7 @@ const styles = StyleSheet.create({
     fontFamily:'Cochin',
     fontSize: 36,
     fontWeight: 'bold',
-    color:'#5197F9'
+    color:'#70CCF6'
 
   }
 });
