@@ -27,6 +27,9 @@ class LoginScreen extends React.Component<Props,state> {
       modal:false
     }
   }
+  prueba=()=>{
+    this.mensajeShow('correcto',200)
+  }
   toggleModal = () => {
     this.setState({ modal: !this.state.modal });
   };
@@ -95,11 +98,11 @@ class LoginScreen extends React.Component<Props,state> {
               <View>
                 <Text style={styles.txtLogin}>INICIO DE SESIÓN</Text>
               </View>
-              <Item rounded style={{ margin: 15, marginTop: 250,backgroundColor:'#EBF1F3' }}>
+              <Item rounded style={{ marginLeft: 15,margin:15, marginTop: 250, marginRight:15,backgroundColor:'#EBF1F3' }}>
                 <Icon name='person' style={styles.icon}/>
                 <Input autoCorrect={false} value={this.state.usuario} placeholder="usuario" onChangeText={(value) => this.setState({usuario: value})}/>
               </Item>
-              <Item rounded style={{ margin: 15, marginTop: 0,backgroundColor:'#EBF1F3' }}>
+              <Item rounded style={{ marginLeft: 15,margin:15, marginTop: 0, marginRight:15,backgroundColor:'#EBF1F3' }}>
                 <Icon name='lock' style={styles.icon}/>
                 <Input autoCorrect={false} secureTextEntry={this.state.hidden} value={this.state.password} placeholder="contraseña" onChangeText={(value) => this.setState({password: value})} />
                 <Icon name='eye' style={styles.icon} onPress={this.ocultarPress}/>
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
   },
   txtLogin:{
     position: 'absolute',
-    top:120,
+    top:100,
     alignSelf: 'center',
     fontFamily:'Cochin',
     fontSize: 36,

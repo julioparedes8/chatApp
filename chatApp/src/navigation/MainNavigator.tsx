@@ -5,6 +5,7 @@ import AvisoScreen from '../screens/AvisoScreen';
 import AgendaScreen from '../screens/AgendaScreen';
 import HomeScreen from '../screens/HomeScreen';
 import AlertaScreen from '../screens/AlertaScreen';
+import MessagesScreen from '../screens/MessagesScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
@@ -14,8 +15,8 @@ const MainNavigator= createStackNavigator(
       Home:{
           screen: HomeScreen
       },
-      Chat:{
-          screen: ChatScreen
+      Messages:{
+          screen: MessagesScreen
       },
       Aviso:{
           screen: AvisoScreen
@@ -29,6 +30,9 @@ const MainNavigator= createStackNavigator(
       Login:{
           screen: LoginScreen
       },
+      Chat:{
+        screen: ChatScreen
+      }
       
   },
   {

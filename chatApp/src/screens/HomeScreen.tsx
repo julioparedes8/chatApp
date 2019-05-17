@@ -4,7 +4,7 @@ import api from '../api';
 import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
-import ChatScreen from './ChatScreen';
+import MessagesScreen from './MessagesScreen';
 import AlertaScreen from './AlertaScreen';
 import AvisoScreen from './AvisoScreen';
 import AgendaScreen from './AgendaScreen';
@@ -29,12 +29,24 @@ class HomeScreen extends React.Component<Props,State> {
       'Cerrar Sesión',
       '¿Seguro que deseas cerrar sesión?',
       [
-        {text: 'Si', onPress: () => this.props.navigation.navigate("Login")},
+        {text: 'Si', onPress: () => this.borrarToken()},
         {text: 'No', onPress: () =>'cancelar'},
       ],
       {cancelable: false},
     );
   }
+  borrarToken=async ()=>{
+    try {
+      await AsyncStorage.removeItem('Token')
+      console.log('ya se removio')
+      const tkn = await AsyncStorage.getItem('Token')
+      console.log(tkn)
+      this.props.navigation.navigate("Login")
+    } catch (e) {
+      // saving error
+    }
+  }
+  
   render(){
     let AppComponent = null;
     let nombre= '';
@@ -45,8 +57,8 @@ class HomeScreen extends React.Component<Props,State> {
       AppComponent = AvisoScreen
       nombre= 'Avisos'
     } else if (this.state.index == 3){
-      AppComponent = ChatScreen
-      nombre= 'Chats'
+      AppComponent = MessagesScreen
+      nombre= 'Mensaje'
     } else {
       AppComponent = AgendaScreen
       nombre= 'Agenda'
@@ -75,10 +87,10 @@ class HomeScreen extends React.Component<Props,State> {
           </Right>
         </Header>
         <Content padder>
-          <AppComponent/>
+          <AppComponent navigation={this.props.navigation}/>
         </Content>
         <Footer>
-          <FooterTab style={{backgroundColor:"#70CCF6", tabActiveBgColor: "#E8EAED"}}>
+          <FooterTab style={{backgroundColor:"#70CCF6", tabActiveBgColor: "white"}}>
             <Button vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
               <Icon name="ios-alarm" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Alertas</Text>

@@ -5,10 +5,11 @@ import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 export interface Props {
+  navigation: NavigationScreenProp<any,any>,
   };
 let API = new api();
 class AgendaScreen extends React.Component<Props> {
-    constructor(props: Props){
+    constructor(props:Props){
       super(props);
     }
     render(){ 

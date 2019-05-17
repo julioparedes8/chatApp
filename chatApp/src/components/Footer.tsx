@@ -26,7 +26,7 @@ export default class FooterComponent extends React.Component<Props,State>{
                   <Icon name="md-notifications"/>
                   <Text>Avisos</Text>
                 </Button>
-                <Button vertical onPress={()=> this.setState({activeButton:'chat'})} active={this.state.activeButton === 'chat'}>
+                <Button vertical onPress={()=> this.setState({activeButton:'mensaje'})} active={this.state.activeButton === 'mensaje'}>
                   <Icon name="ios-chatbubbles" />
                   <Text>Chats</Text>
                 </Button>
