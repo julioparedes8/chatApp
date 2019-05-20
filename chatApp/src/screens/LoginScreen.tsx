@@ -54,7 +54,7 @@ class LoginScreen extends React.Component<Props,state> {
     })
     .catch(error => console.log(error))
   }
-  mensajeShow = (mensaje:string,status:number)=>{
+  mensajeShow = (mensaje:any,status:any)=>{
     if (status==200){
       Alert.alert(
         'Inicio de Sesión',

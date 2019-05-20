@@ -23,7 +23,7 @@ export default class FooterComponent extends React.Component<Props,State>{
                   <Text>Alertas</Text>
                 </Button>
                 <Button vertical  onPress={()=> this.setState({activeButton:'aviso'})} active={this.state.activeButton === 'aviso'}>
-                  <Icon name="md-notifications"/>
+                  <Icon name="md-notifications" style={{color: 'red'}}/>
                   <Text>Avisos</Text>
                 </Button>
                 <Button vertical onPress={()=> this.setState({activeButton:'mensaje'})} active={this.state.activeButton === 'mensaje'}>

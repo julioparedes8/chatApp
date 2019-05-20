@@ -35,6 +35,9 @@ class HomeScreen extends React.Component<Props,State> {
       {cancelable: false},
     );
   }
+  enviarMensaje=()=>{
+    this.props.navigation.navigate('EnviarMensaje')
+  }
   borrarToken=async ()=>{
     try {
       await AsyncStorage.removeItem('Token')
@@ -70,7 +73,8 @@ class HomeScreen extends React.Component<Props,State> {
             {this.state.index==3 && 
               <Button
                 transparent
-                  >
+                onPress={()=>this.enviarMensaje()}
+                >
                 <Icon type="Entypo" name="new-message" />
               </Button>
             } 

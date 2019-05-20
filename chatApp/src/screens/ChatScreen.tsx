@@ -8,8 +8,20 @@ import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Foo
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
+interface User {
+    _id: number;
+    name: string;
+    avatar: string; 
+}
+interface Messages {
+    _id: number;
+    text: string;
+    createdAt: Date;
+    user:User;
+
+}
 interface state{
-  messages?: [];
+  messages?:Messages[];
 }
 let API = new api();
 class ChatScreen extends React.Component<Props,state> {
@@ -18,6 +30,29 @@ class ChatScreen extends React.Component<Props,state> {
       this.state = {
         messages:[]
       }
+    }
+    componentWillMount() {
+      this.setState({
+        messages: [
+          {
+            _id: 1,
+            text: "Hello developer",
+            createdAt: new Date(),
+            user: {
+              _id: 2,
+              name: "React Native",
+              avatar: "https://placeimg.com/140/140/any"
+            }
+          }
+        ]
+      })
+    }
+    onSend=(messages = [])=> {
+      this.setState(previousState => {
+        return ({
+          messages: GiftedChat.append(previousState.messages, messages)
+        });
+      });
     }
     render(){
           return (
@@ -40,17 +75,14 @@ class ChatScreen extends React.Component<Props,state> {
                   
                   </Right>
                 </Header>
-                <Content padder>
-                </Content>
-              <GiftedChat
+                <GiftedChat
                     messages={this.state.messages}
-                    onSend={(message)=>{
-                      //
-                    }}
+                    onSend={messages => this.onSend(messages)}
                     user={{
-                      _id: 1,
+                      _id: 1
                     }}
                 />
+                
             </Container>
             
           )

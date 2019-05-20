@@ -6,6 +6,8 @@ import AgendaScreen from '../screens/AgendaScreen';
 import HomeScreen from '../screens/HomeScreen';
 import AlertaScreen from '../screens/AlertaScreen';
 import MessagesScreen from '../screens/MessagesScreen';
+import EnviarMensajeScreen from '../screens/EnviarMensajeScreen';
+import LoadingScreen from '../screens/LoadingScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
@@ -32,6 +34,9 @@ const MainNavigator= createStackNavigator(
       },
       Chat:{
         screen: ChatScreen
+      },
+      EnviarMensaje:{
+        screen: EnviarMensajeScreen
       }
       
   },
@@ -40,11 +45,11 @@ const MainNavigator= createStackNavigator(
   }
 )
 const AppStack = MainNavigator;
-const AuthStack = createStackNavigator({ Login: LoginScreen });
+const AuthStack = createStackNavigator({ Login: LoginScreen},{headerMode:'none'});
 export default createAppContainer(createSwitchNavigator(
   {
     //AuthLoading: AuthLoadingScreen,
-    AuthLoading: LoginScreen,
+    AuthLoading: LoadingScreen,
     App: AppStack,
     Auth: AuthStack,
   },
