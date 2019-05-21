@@ -27,15 +27,15 @@ class AgendaScreen extends React.Component<Props,State> {
             this.state.items[strTime] = [];
             const numItems = Math.floor(Math.random() * 5);
             for (let j = 0; j < numItems; j++) {
-              this.state.items[strTime].push({
-                name: 'Item for ' + strTime,
-                height: Math.max(50, Math.floor(Math.random() * 150))
-              });
+              //this.state.items[strTime].push({
+                //name: 'Item for ' + strTime,
+                //height: 80
+              //});
             }
           }
         }
         //console.log(this.state.items);
-        const newItems = {};
+        const newItems: any = {};
         Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
         this.setState({
           items: newItems
@@ -70,7 +70,7 @@ class AgendaScreen extends React.Component<Props,State> {
           <Agenda
             items={this.state.items}
             loadItemsForMonth={this.loadItems.bind(this)}
-            selected={'2017-05-16'}
+            selected={'2019-05-21'}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={this.rowHasChanged.bind(this)}
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 17
   },
   emptyDate: {
-    height: 15,
+    height: 80,
     flex:1,
     paddingTop: 30
   }

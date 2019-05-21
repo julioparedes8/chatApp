@@ -77,7 +77,15 @@ class HomeScreen extends React.Component<Props,State> {
                 >
                 <Icon type="Entypo" name="new-message" />
               </Button>
-            } 
+            }
+            {this.state.index==4 && 
+              <Button
+                transparent
+                onPress={()=>this.enviarMensaje()}
+                >
+                <Icon type="MaterialCommunityIcons" name="calendar-plus" />
+              </Button>
+            }  
           </Left>
           <Body style={{ flex:1}}>
             <Title  style={{ alignSelf: 'center'}}>{nombre}</Title>
