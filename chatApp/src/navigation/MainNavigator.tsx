@@ -8,6 +8,7 @@ import AlertaScreen from '../screens/AlertaScreen';
 import MessagesScreen from '../screens/MessagesScreen';
 import EnviarMensajeScreen from '../screens/EnviarMensajeScreen';
 import LoadingScreen from '../screens/LoadingScreen';
+import CrearTareaScreen from '../screens/CrearTareaScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
@@ -37,6 +38,9 @@ const MainNavigator= createStackNavigator(
       },
       EnviarMensaje:{
         screen: EnviarMensajeScreen
+      },
+      CrearTarea:{
+        screen:CrearTareaScreen
       }
       
   },

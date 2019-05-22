@@ -2,6 +2,7 @@ import React from 'react'
 import {NavigationScreenProp } from 'react-navigation';
 import { Container,Spinner, Content, List,Footer,FooterTab, ListItem, Accordion, Button, Icon,Left,Right, Text, Item  } from "native-base";
 import AsyncStorage from '@react-native-community/async-storage';
+import { StyleSheet } from 'react-native';
 export interface Props {
     navigation: NavigationScreenProp<any,any>,
 }
@@ -34,12 +35,24 @@ export default class LoadingScreen extends React.Component<Props,State>{
     }
     render(){
         return (
-            <Container>
-                <Content>
+            <Container style={styles.container}>
+                <Content  contentContainerStyle={styles.spinnerStyle}>
                     <Spinner color='blue' />
+                    <Text>Cargando...</Text>
                 </Content>
             </Container>
             )
 
     }
   }
+  const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        // backgroundColor: '#4286f4',
+      },
+    spinnerStyle: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });

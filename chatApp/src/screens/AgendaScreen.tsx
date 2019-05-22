@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
+import { LocaleConfig } from 'react-native-calendars';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
@@ -9,16 +10,29 @@ export interface Props {
   };
 interface State{
   items?:any
+  selectedDate?: any
+  cargando?: boolean
 }
 let API = new api();
+LocaleConfig.locales['mx'] = {
+  monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+  monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+  dayNames: ['Domingo','Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viérnes', 'Sábado'],
+  dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vié', 'Sáb'],
+  
+};
+LocaleConfig.defaultLocale = 'mx';
 class AgendaScreen extends React.Component<Props,State> {
     constructor(props:Props){
       super(props);
       this.state={
-        items:{}
+        items:{},
+        selectedDate: null,
+        cargando:true
       }
     }
     loadItems(day: { timestamp: number; }) {
+      this.setState({selectedDate: day});
       setTimeout(() => {
         for (let i = -15; i < 85; i++) {
           const time = day.timestamp + i * 24 * 60 * 60 * 1000;
@@ -52,7 +66,7 @@ class AgendaScreen extends React.Component<Props,State> {
   
     renderEmptyDate() {
       return (
-        <View style={styles.emptyDate}><Text>This is empty date!</Text></View>
+        <View style={styles.emptyDate}><Text></Text></View>
       );
     }
   
@@ -64,16 +78,25 @@ class AgendaScreen extends React.Component<Props,State> {
       const date = new Date(time);
       return date.toISOString().split('T')[0];
     }
-    render(){ 
+    selected(){
+      const strTime = new Date().toDateString();
+      return  strTime
+    }
+    render(){
+
       return(
-        <Content padder>
+        <Content >
           <Agenda
             items={this.state.items}
             loadItemsForMonth={this.loadItems.bind(this)}
-            selected={'2019-05-21'}
+            //selected={'2019-05-22'}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={this.rowHasChanged.bind(this)}
+             // Max amount of months allowed to scroll to the past. Default = 50
+            pastScrollRange={12}
+            // Max amount of months allowed to scroll to the future. Default = 50
+            futureScrollRange={12}
             // markingType={'period'}
             // markedDates={{
             //    '2017-05-08': {textColor: '#666'},

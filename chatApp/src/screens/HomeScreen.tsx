@@ -38,6 +38,9 @@ class HomeScreen extends React.Component<Props,State> {
   enviarMensaje=()=>{
     this.props.navigation.navigate('EnviarMensaje')
   }
+  crearTarea=()=>{
+    this.props.navigation.navigate('CrearTarea')
+  }
   borrarToken=async ()=>{
     try {
       await AsyncStorage.removeItem('Token')
@@ -81,7 +84,7 @@ class HomeScreen extends React.Component<Props,State> {
             {this.state.index==4 && 
               <Button
                 transparent
-                onPress={()=>this.enviarMensaje()}
+                onPress={()=>this.crearTarea()}
                 >
                 <Icon type="MaterialCommunityIcons" name="calendar-plus" />
               </Button>
