@@ -85,33 +85,34 @@ class AgendaScreen extends React.Component<Props,State> {
     render(){
 
       return(
-        <Content >
-          <Agenda
-            items={this.state.items}
-            loadItemsForMonth={this.loadItems.bind(this)}
-            //selected={'2019-05-22'}
-            renderItem={this.renderItem.bind(this)}
-            renderEmptyDate={this.renderEmptyDate.bind(this)}
-            rowHasChanged={this.rowHasChanged.bind(this)}
-             // Max amount of months allowed to scroll to the past. Default = 50
-            pastScrollRange={12}
-            // Max amount of months allowed to scroll to the future. Default = 50
-            futureScrollRange={12}
-            // markingType={'period'}
-            // markedDates={{
-            //    '2017-05-08': {textColor: '#666'},
-            //    '2017-05-09': {textColor: '#666'},
-            //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
-            //    '2017-05-21': {startingDay: true, color: 'blue'},
-            //    '2017-05-22': {endingDay: true, color: 'gray'},
-            //    '2017-05-24': {startingDay: true, color: 'gray'},
-            //    '2017-05-25': {color: 'gray'},
-            //    '2017-05-26': {endingDay: true, color: 'gray'}}}
-            // monthFormat={'yyyy'}
-            // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
-            //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
-          />
-        </Content>
+            <View style={{height:500}}>
+              <Agenda
+                items={this.state.items}
+                loadItemsForMonth={this.loadItems.bind(this)}
+                //selected={'2019-05-22'}
+                renderItem={this.renderItem.bind(this)}
+                renderEmptyDate={this.renderEmptyDate.bind(this)}
+                rowHasChanged={this.rowHasChanged.bind(this)}
+                // Max amount of months allowed to scroll to the past. Default = 50
+                pastScrollRange={0}
+                // Max amount of months allowed to scroll to the future. Default = 50
+                futureScrollRange={50}
+                // Enable or disable scrolling of calendar list
+                // markingType={'period'}
+                // markedDates={{
+                //    '2017-05-08': {textColor: '#666'},
+                //    '2017-05-09': {textColor: '#666'},
+                //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
+                //    '2017-05-21': {startingDay: true, color: 'blue'},
+                //    '2017-05-22': {endingDay: true, color: 'gray'},
+                //    '2017-05-24': {startingDay: true, color: 'gray'},
+                //    '2017-05-25': {color: 'gray'},
+                //    '2017-05-26': {endingDay: true, color: 'gray'}}}
+                // monthFormat={'yyyy'}
+                // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
+                //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
+              />
+          </View>
         )
     }
 }
