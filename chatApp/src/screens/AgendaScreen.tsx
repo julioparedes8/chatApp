@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
+import {View,StyleSheet,FlatList, AsyncStorage, Dimensions} from 'react-native'
 import api from '../api';
 import { LocaleConfig } from 'react-native-calendars';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
@@ -13,6 +13,7 @@ interface State{
   selectedDate?: any
   cargando?: boolean
 }
+let {height, width} = Dimensions.get('window');
 let API = new api();
 LocaleConfig.locales['mx'] = {
   monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -85,7 +86,7 @@ class AgendaScreen extends React.Component<Props,State> {
     render(){
 
       return(
-            <View style={{height:500}}>
+            <View style={{height: height-200}}>
               <Agenda
                 items={this.state.items}
                 loadItemsForMonth={this.loadItems.bind(this)}

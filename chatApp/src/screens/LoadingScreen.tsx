@@ -13,9 +13,9 @@ export default class LoadingScreen extends React.Component<Props,State>{
     constructor(props: Props){
         super(props);
         this.state={
-            sesion:false
+            sesion:true
         }
-        this.getToken()
+        //this.getToken()
     }
     getToken=async ()=>{
         try {
@@ -30,7 +30,7 @@ export default class LoadingScreen extends React.Component<Props,State>{
         // saving error
         }
     }
-    componentDidUpdate(){
+    componentDidMount(){
         this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
     }
     render(){

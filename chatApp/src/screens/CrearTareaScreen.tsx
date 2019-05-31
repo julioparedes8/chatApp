@@ -10,22 +10,31 @@ export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
 interface state{
-    chosenDate?: any;
+    creacionDate?: any;
+    expiracionDate?: any;
     selectedAviso?:string;
     selectedGrupo?:string;
     selectedTipo?:string;
     checked:boolean;
     enabled:boolean;
+    asunto:string;
+    contenido:string;
 }
 let API = new api();
+let usuario:String;
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = { chosenDate: new Date(),selectedAviso:'',selectedGrupo:'',selectedTipo:'',checked: false,enabled: false };
-      this.setDate = this.setDate.bind(this);
+      this.state = { asunto:'',contenido:'',expiracionDate:new Date(),creacionDate: new Date(),selectedAviso:'',selectedGrupo:'',selectedTipo:'',checked: false,enabled: false };
+      this.setDateCreacion = this.setDateCreacion.bind(this);
+      this.setDateExpiracion = this.setDateExpiracion.bind(this);
+      usuario='PRUEBACHAT'
     }
-    setDate(newDate:any) {
-        this.setState({ chosenDate: newDate });
+    setDateCreacion(newDate:any) {
+        this.setState({ creacionDate: newDate });
+    }
+    setDateExpiracion(newDate:any) {
+      this.setState({ expiracionDate: newDate });
     }
     comboAviso(selected:string){
       this.setState({selectedAviso: selected})
@@ -40,7 +49,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
           return (
             <Container>
               <Header style={{backgroundColor:"#70CCF6"}}>
-              <Left style={{ flex:1}}>
+                  <Left style={{ flex:1}}>
                     
                     <Button
                       transparent
@@ -59,12 +68,10 @@ class CrearTareaScreen extends React.Component<Props,state> {
               </Header>
               <Content>
                 <Form>
-                  <View style={{flexDirection:'row'}}>
                     <View
                         style={{
                           flexDirection: 'column',
                           height: 190,
-                          width:260,
                           // Set border width.
                           borderWidth: 2,
                           // Set border Hex Color Code Here.
@@ -76,16 +83,15 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           // Adding padding on Text component.
                           padding : 2,
                           fontSize: 20,
-                          textAlign: 'left',
                           margin: 10,
-                          alignItems:'flex-start'
+                          alignItems:'center'
                         }}>
-                        <Text style={{fontWeight: 'bold',textAlign:'center'}}>Fecha</Text>
+                        <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Fecha</Text>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
                           <Text style={{marginRight:5,marginTop:10,marginBottom:10}}>Creación:</Text>
                           <DatePicker
                             style={{width: 160,marginLeft:13,marginRight:15,marginTop:5,marginBottom:5}}
-                            date={this.state.chosenDate}
+                            date={this.state.creacionDate}
                             mode="datetime"
                             format="YYYY-MM-DD HH:mm"
                             confirmBtnText="Ok"
@@ -102,14 +108,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 }
                             }}
                             minuteInterval={10}
-                            onDateChange={(datetime:any) => {this.setState({chosenDate: datetime});}}
+                            onDateChange={(datetime:any) => {this.setState({creacionDate: datetime});}}
                             />
                         </View>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
                           <Text style={{marginRight:5,marginTop:10,marginBottom:10}} >Expiración:</Text>
                           <DatePicker
                             style={{width: 160, marginLeft:2,marginRight:15}}
-                            date={this.state.chosenDate}
+                            date={this.state.expiracionDate}
                             mode="date"
                             format="YYYY-MM-DD"
                             confirmBtnText="Ok"
@@ -126,12 +132,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 }
                             }}
                             minuteInterval={10}
-                            onDateChange={(datetime:any) => {this.setState({chosenDate: datetime});}}
+                            onDateChange={(date:any) => {this.setState({expiracionDate: date});}}
                             />
                         </View>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
-                          <Text style={{ marginRight:5,marginTop:18,marginBottom:18}}>Aviso:</Text>
-                          <View style={{width:200,marginLeft:2,marginRight:15,marginTop:3,marginBottom:3}}>
+                          <Text style={{ marginRight:5,marginTop:14,marginBottom:14}}>Aviso:</Text>
+                          <View style={{width:200,marginLeft:2,marginRight:15,marginTop:0,marginBottom:0}}>
                             <Item picker>
                                 <Picker
                                   mode="dropdown"
@@ -159,8 +165,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                     <View
                         style={{
                           flexDirection: 'column',
-                          height: 190,
-                          width:115,
+                          height: 100,
                           // Set border width.
                           borderWidth: 2,
                           // Set border Hex Color Code Here.
@@ -172,28 +177,21 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           // Adding padding on Text component.
                           padding : 2,
                           fontSize: 20,
-                          textAlign: 'left',
-                         // margin: 10,
-                          marginLeft:1,
-                          marginBottom:10,
-                          marginTop:10,
-                          marginStart:10,
-                          marginEnd:10,
-                          alignItems:'flex-start'
+                          margin: 10,
+                          alignItems:'center'
                         }}>
-                        <Text style={{fontWeight: 'bold',textAlign:'center'}}>Grupo</Text>
+                        <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Grupo</Text>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
                           <CheckBox
+                            containerStyle={{marginRight:5,marginTop:10,marginBottom:10}}
                             title='Publicar'
                             size={17}
                             textStyle={{fontSize:12,fontWeight:'normal'}}
                             checked={this.state.checked}
                             onPress={() => this.setState({checked: !this.state.checked,enabled: !this.state.enabled})}
                           />
-                        </View>
-                        <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
-                          <View style={{width:110,marginLeft:2,marginRight:15,marginTop:3,marginBottom:3}}>
-                            <Item picker>
+                          <View style={{width:140}}>
+                              <Item picker>
                                 <Picker
                                   mode="dropdown"
                                   iosIcon={<Icon name="arrow-down" />}
@@ -208,12 +206,11 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                   <Picker.Item label="Grupo 1" value="key0" />
                                   <Picker.Item label="Grupo 2" value="key1" />
                                 </Picker>
-                            </Item>
+                              </Item>
                           </View>
                         </View>
                       </View>
-                  </View>
-                  <View
+                    <View
                       style={{
                         flexDirection: 'column',
                         height: 285,
@@ -229,15 +226,17 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         padding : 2,
                         fontSize: 20,
                         margin: 10,
+                        alignItems:'center'
                       }}>
                       <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Detalles</Text>
                       <View style={{ flexDirection: 'row'}}>
                         <View  style={{ flexDirection: 'row'}}>
-                          <Text style={{textAlign:'left'}}>Creador:</Text>
-                          <Text >Administrador</Text>
+                          <Text style={{marginLeft:5,marginTop:16,marginBottom:16}}>Creador :</Text>
+                          <Text style={{fontWeight: 'bold',marginTop:16,marginBottom:16}} >{usuario}</Text>
                         </View >
                         <View style={{ flexDirection: 'row'}}>
-                        <Text style={{textAlign:'right'}}>Aviso:</Text>
+                        <Text style={{marginLeft:10,marginTop:16,marginBottom:16}}>Tipo:</Text>
+                        <View style={{flex:1,marginRight:5,marginTop:1,marginBottom:1}}>
                           <Item picker>
                               <Picker
                                 mode="dropdown"
@@ -255,8 +254,16 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 <Picker.Item label="Otro" value="key3" />
                               </Picker>
                           </Item>
-                        
+                          </View>
                         </View>
+                      </View>
+                      <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
+                          <Text style={{marginRight:5,marginTop:14,marginBottom:14}}>Asunto :</Text>
+                          <Textarea onChangeText={(asunto) => this.setState({asunto})} value={this.state.asunto} rowSpan={1} style={{marginLeft:20,marginTop:10,marginBottom:10,color: '#616161',height:40,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}} placeholder="" />
+                      </View>
+                      <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
+                          <Text style={{marginRight:5,marginTop:14,marginBottom:14}}>Contenido :</Text>
+                          <Textarea  onChangeText={(contenido) => this.setState({contenido})} value={this.state.contenido} rowSpan={4} style={{marginRight:5,marginTop:10,marginBottom:10,color: '#616161',height:130,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}} placeholder="" />
                       </View>
                   </View>
                     <Button rounded block info  style={styles.button} >
