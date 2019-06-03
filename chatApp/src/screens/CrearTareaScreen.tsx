@@ -213,7 +213,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                     <View
                       style={{
                         flexDirection: 'column',
-                        height: 285,
+                        height: 340,
                         // Set border width.
                         borderWidth: 2,
                         // Set border Hex Color Code Here.
@@ -226,17 +226,16 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         padding : 2,
                         fontSize: 20,
                         margin: 10,
-                        alignItems:'center'
                       }}>
                       <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Detalles</Text>
-                      <View style={{ flexDirection: 'row'}}>
-                        <View  style={{ flexDirection: 'row'}}>
+                      <View style={{ flexDirection: 'column',alignItems:'center'}}>
+                        <View  style={{ flexDirection: 'row',alignItems: 'flex-start'}}>
                           <Text style={{marginLeft:5,marginTop:16,marginBottom:16}}>Creador :</Text>
                           <Text style={{fontWeight: 'bold',marginTop:16,marginBottom:16}} >{usuario}</Text>
                         </View >
-                        <View style={{ flexDirection: 'row'}}>
+                        <View style={{ flexDirection: 'row',width:200}}>
                         <Text style={{marginLeft:10,marginTop:16,marginBottom:16}}>Tipo:</Text>
-                        <View style={{flex:1,marginRight:5,marginTop:1,marginBottom:1}}>
+                        <View style={{flex:1,marginRight:5,marginTop:1,marginBottom:1,alignItems:'flex-end'}}>
                           <Item picker>
                               <Picker
                                 mode="dropdown"
@@ -258,8 +257,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         </View>
                       </View>
                       <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
-                          <Text style={{marginRight:5,marginTop:14,marginBottom:14}}>Asunto :</Text>
-                          <Textarea onChangeText={(asunto) => this.setState({asunto})} value={this.state.asunto} rowSpan={1} style={{marginLeft:20,marginTop:10,marginBottom:10,color: '#616161',height:40,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}} placeholder="" />
+                          <Text style={{marginLeft:22,marginRight:5,marginTop:14,marginBottom:14}}>Asunto :</Text>
+                          <Textarea onChangeText={(asunto) => this.setState({asunto})} value={this.state.asunto} rowSpan={1} style={{marginRight:5,marginTop:10,marginBottom:10,color: '#616161',height:40,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}} placeholder="" />
                       </View>
                       <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
                           <Text style={{marginRight:5,marginTop:14,marginBottom:14}}>Contenido :</Text>

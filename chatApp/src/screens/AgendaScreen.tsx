@@ -95,7 +95,7 @@ class AgendaScreen extends React.Component<Props,State> {
                 renderEmptyDate={this.renderEmptyDate.bind(this)}
                 rowHasChanged={this.rowHasChanged.bind(this)}
                 // Max amount of months allowed to scroll to the past. Default = 50
-                pastScrollRange={0}
+                pastScrollRange={1}
                 // Max amount of months allowed to scroll to the future. Default = 50
                 futureScrollRange={50}
                 // Enable or disable scrolling of calendar list
