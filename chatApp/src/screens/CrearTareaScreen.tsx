@@ -77,12 +77,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           // Set border Hex Color Code Here.
                           borderColor: '#F7F7F7',
                           // Setting up Text Font Color.
-                          color: 'black',
+                          
                           // Setting Up Background Color of Text component.
                           backgroundColor : 'white',
                           // Adding padding on Text component.
                           padding : 2,
-                          fontSize: 20,
+                         
                           margin: 10,
                           alignItems:'center'
                         }}>
@@ -171,12 +171,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           // Set border Hex Color Code Here.
                           borderColor: '#F7F7F7',
                           // Setting up Text Font Color.
-                          color: 'black',
+                         
                           // Setting Up Background Color of Text component.
                           backgroundColor : 'white',
                           // Adding padding on Text component.
                           padding : 2,
-                          fontSize: 20,
+                         
                           margin: 10,
                           alignItems:'center'
                         }}>
@@ -217,14 +217,10 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         // Set border width.
                         borderWidth: 2,
                         // Set border Hex Color Code Here.
-                        borderColor: '#F7F7F7',
-                        // Setting up Text Font Color.
-                        color: 'black',
-                        // Setting Up Background Color of Text component.
+                        borderColor: '#F7F7F7',                        // Setting Up Background Color of Text component.
                         backgroundColor : 'white',
                         // Adding padding on Text component.
                         padding : 2,
-                        fontSize: 20,
                         margin: 10,
                       }}>
                       <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Detalles</Text>
