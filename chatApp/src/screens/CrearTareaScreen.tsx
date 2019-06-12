@@ -272,7 +272,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
 }
 const styles = StyleSheet.create({
   button:{
-    margin: 50,
+    margin: 120,
     marginBottom:10, 
     marginTop: 10,
     backgroundColor:'#70CCF6'

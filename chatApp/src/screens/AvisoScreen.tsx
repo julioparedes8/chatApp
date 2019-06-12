@@ -22,8 +22,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -36,8 +36,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -50,8 +50,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -64,8 +64,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -78,8 +78,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -92,8 +92,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -106,8 +106,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -120,8 +120,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>
@@ -134,8 +134,8 @@ class AvisoScreen extends React.Component<Props> {
                   <Thumbnail square source={require('../../assets/user.png')} />
                 </Left>
                 <Body>
-                  <Text>Sankhadeep</Text>
-                  <Text note numberOfLines={1}>Its time to build a difference . .</Text>
+                  <Text>Titulo</Text>
+                  <Text note numberOfLines={1}>Aqui va el contenido . .</Text>
                 </Body>
                 <Right>
                   <Button transparent>

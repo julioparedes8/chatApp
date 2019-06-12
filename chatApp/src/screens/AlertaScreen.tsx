@@ -19,7 +19,7 @@ class AlertaScreen extends React.Component<Props> {
             <List>
               <ListItem thumbnail >
                 <Left>
-                  <Thumbnail style={{height:20,width:50}} square source={require('../../assets/rojo.png')} />
+                  <Thumbnail style={{}} square source={require('../../assets/priority_high.png')} />
                 </Left>
                 <Body>
                   <Text>Prioridad 1</Text>
@@ -33,7 +33,7 @@ class AlertaScreen extends React.Component<Props> {
               </ListItem>
               <ListItem thumbnail >
                 <Left>
-                  <Thumbnail style={{height:20,width:50}}  square source={require('../../assets/amarillo.png')} />
+                  <Thumbnail style={{}}  square source={require('../../assets/priority_medium.png')} />
                 </Left>
                 <Body>
                   <Text>Prioridad 2</Text>
@@ -47,7 +47,7 @@ class AlertaScreen extends React.Component<Props> {
               </ListItem>
               <ListItem thumbnail >
                 <Left>
-                  <Thumbnail style={{height:20,width:50}}  square source={require('../../assets/verde.png')} />
+                  <Thumbnail style={{}}  square source={require('../../assets/priority_low.png')} />
                 </Left>
                 <Body>
                   <Text>Prioridad 3</Text>

@@ -28,8 +28,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -40,8 +40,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -52,8 +52,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -64,8 +64,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -76,8 +76,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -88,8 +88,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
@@ -100,8 +100,8 @@ class MessagesScreen extends React.Component<Props> {
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
-                      <Text>Kumar Pratik</Text>
-                      <Text note>Doing what you like will always keep you happy . .</Text>
+                      <Text>Emisor</Text>
+                      <Text note>Este es el contenido del mensaje . .</Text>
                     </Body>
                     <Right>
                       <Text note>3:43 pm</Text>
