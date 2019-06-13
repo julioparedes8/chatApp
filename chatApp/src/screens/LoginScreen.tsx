@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View,StyleSheet,FlatList,ImageBackground, Alert} from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../api';
+import localstorage from '../localstorage';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import { Login } from '../entidades/login';
@@ -16,7 +17,9 @@ interface state{
     modal?: boolean,
 }
 let API = new api();
+let LOCALSTORAGE = new localstorage();
 let token=""
+let refresh=""
 class LoginScreen extends React.Component<Props,state> {
   constructor(props: Readonly<Props>){
     super(props);
@@ -44,12 +47,15 @@ class LoginScreen extends React.Component<Props,state> {
     }
     API.login(config)
     .then(response => {
-    const parsedJSON = response;
-    const login: Login[] = parsedJSON as Login[];
-    //console.log('MESSAGE: ' +login.message);
-    //console.log('STATUS: ' +login.status);
-    //console.log('TOKEN: ' +login.resp);
-    token=login.resp
+      const parsedJSON = response;
+      var login: Login[] = parsedJSON as Login[];
+      //console.log('MESSAGE: ' +login.message);
+      //console.log('STATUS: ' +login.status);
+      //console.log('TOKEN: ' +login.resp);
+      if (String(login.status)=='200'){
+        token=login.resp.token
+        refresh=login.resp.refresh
+      }
     this.mensajeShow(login.message,login.status)
     })
     .catch(error => console.log(error))
@@ -76,21 +82,13 @@ class LoginScreen extends React.Component<Props,state> {
     }
   }
   loginCorrecto=()=>{
-    this.setToken()
+    LOCALSTORAGE.setToken(token)
+    LOCALSTORAGE.setRefresh(refresh)
     this.props.navigation.navigate("Home")
-  }
-  setToken=async ()=>{
-    try {
-      await AsyncStorage.setItem('Token', JSON.stringify(token))
-      const tkn = await AsyncStorage.getItem('Token')
-      console.log(tkn)
-    } catch (e) {
-      // saving error
-    }
   }
   render() {
     return (
-      //<ImageBackground
+      //<ImageBackground 
       //source={require('../../assets/background.png')}
      // style={styles.container}>
           <Content padder>

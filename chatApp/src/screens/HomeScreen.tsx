@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage, Alert} from 'react-native'
 import api from '../api';
+import localstorage from '../localstorage';
 import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
@@ -15,6 +16,7 @@ interface State{
   index?: number
 }
 let API = new api();
+let LOCALSTORAGE = new localstorage();
 class HomeScreen extends React.Component<Props,State> {
   constructor(props: Props){
     super(props);
@@ -29,7 +31,7 @@ class HomeScreen extends React.Component<Props,State> {
       'Cerrar Sesión',
       '¿Seguro que deseas cerrar sesión?',
       [
-        {text: 'Si', onPress: () => this.borrarToken()},
+        {text: 'Si', onPress: () => this.salir()},
         {text: 'No', onPress: () =>'cancelar'},
       ],
       {cancelable: false},
@@ -41,16 +43,9 @@ class HomeScreen extends React.Component<Props,State> {
   crearTarea=()=>{
     this.props.navigation.navigate('CrearTarea')
   }
-  borrarToken=async ()=>{
-    try {
-      await AsyncStorage.removeItem('Token')
-      console.log('ya se removio')
-      const tkn = await AsyncStorage.getItem('Token')
-      console.log(tkn)
-      this.props.navigation.navigate("Login")
-    } catch (e) {
-      // saving error
-    }
+  salir=()=>{
+    LOCALSTORAGE.borrarToken()
+    this.props.navigation.navigate("Login")
   }
   
   render(){
@@ -105,7 +100,7 @@ class HomeScreen extends React.Component<Props,State> {
           <AppComponent navigation={this.props.navigation}/>
         </Content>
         <Footer>
-          <FooterTab style={{backgroundColor:"#70CCF6", tabActiveBgColor: "white"}}>
+          <FooterTab style={{backgroundColor:"#70CCF6"}}>
             <Button vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
               <Icon name="ios-alarm" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Alertas</Text>

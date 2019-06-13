@@ -1,5 +1,8 @@
 export interface Login{
     message:String;
     status:Number;
-    resp:String;
+    resp:{
+        refresh: String;
+        token: String;
+    };
 }

@@ -20,11 +20,11 @@ class Api{
             });
         })
     }
-    async getAll(tablaRest : string){
+    async getAll(tablaRest : string,headers:any){
         return new Promise(function(resolve, reject) {
-            axios.get(url.concat( tablaRest ) ,config)
+            axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                resolve(response.data.resp)
+                resolve(response.data)
             })
             .catch(function (error) {
                 console.log(error);

@@ -1,5 +1,6 @@
 import React from 'react'
 import {NavigationScreenProp } from 'react-navigation';
+import localstorage from '../localstorage';
 import { Container,Spinner, Content, List,Footer,FooterTab, ListItem, Accordion, Button, Icon,Left,Right, Text, Item  } from "native-base";
 import AsyncStorage from '@react-native-community/async-storage';
 import { StyleSheet } from 'react-native';
@@ -9,28 +10,18 @@ export interface Props {
 interface State {
   sesion?: boolean;
 }
+let LOCALSTORAGE = new localstorage();
 export default class LoadingScreen extends React.Component<Props,State>{
     constructor(props: Props){
         super(props);
         this.state={
-            sesion:true
+            sesion:false
         }
-        //this.getToken()
+        LOCALSTORAGE.getToken().then(response=>{
+            this.setState({sesion:response})
+        })
     }
-    getToken=async ()=>{
-        try {
-            //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
-            const tkn = await AsyncStorage.getItem('Token')
-            console.log(tkn)
-            if (tkn==null){
-                this.setState({sesion:false})
-            }
-            this.setState({sesion:true})
-        } catch (e) {
-        // saving error
-        }
-    }
-    componentDidMount(){
+    componentDidUpdate(){
         this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
     }
     render(){
