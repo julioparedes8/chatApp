@@ -18,7 +18,7 @@ class LocalStorage{
           // saving error
         }
     }
-    getToken=async ()=>{
+    existToken=async ()=>{
         try {
             //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
             const tkn = await AsyncStorage.getItem('Token')
@@ -33,7 +33,7 @@ class LocalStorage{
         // saving error
         }
     }
-    getRefresh=async ()=>{
+    existRefresh=async ()=>{
       try {
           //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
           const rfs = await AsyncStorage.getItem('Refresh')
@@ -60,6 +60,36 @@ class LocalStorage{
         } catch (e) {
           // saving error
         }
+    }
+    getToken=async ()=>{
+      try {
+          //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
+          const tkn = await AsyncStorage.getItem('Token')
+          //console.log(tkn)
+          if (tkn==null){
+              //this.setState({sesion:false})
+              return ""
+          }
+          //this.setState({sesion:true})
+          return tkn.substr(1,tkn.length-2)
+      } catch (e) {
+      // saving error
+      }
+    }
+    getRefresh=async ()=>{
+      try {
+          //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
+          const rfs = await AsyncStorage.getItem('Refresh')
+          //console.log(rfs)
+          if (rfs==null){
+              //this.setState({sesion:false})
+              return ""
+          }
+          //this.setState({sesion:true})
+          return rfs.substr(1,rfs.length-2)
+      } catch (e) {
+      // saving error
+      }
     }
 }
 export default LocalStorage;

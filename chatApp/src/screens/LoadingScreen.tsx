@@ -17,7 +17,7 @@ export default class LoadingScreen extends React.Component<Props,State>{
         this.state={
             sesion:false
         }
-        LOCALSTORAGE.getToken().then(response=>{
+        LOCALSTORAGE.existToken().then(response=>{
             this.setState({sesion:response})
         })
     }

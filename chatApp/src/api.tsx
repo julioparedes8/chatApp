@@ -27,8 +27,8 @@ class Api{
                 resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                console.log(error.message);
+                reject('401')
                 //return error;
             });
         })
@@ -72,9 +72,9 @@ class Api{
             });
         })
     }
-    async login(headers:any){
+    async sesion(tipo:string,headers:any){
         return new Promise(function(resolve, reject) {
-            axios.post(url.concat( 'login' ),"" ,headers)
+            axios.post(url.concat( tipo ),"" ,headers)
             .then(function (response) {
                 resolve(response.data)
             })

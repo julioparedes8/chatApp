@@ -45,13 +45,13 @@ class LoginScreen extends React.Component<Props,state> {
     let config = {
       headers: { 'tenantId':'macropro','Content-Type': 'application/json','codigo':this.state.usuario,'password':this.state.password}
     }
-    API.login(config)
+    API.sesion('login',config)
     .then(response => {
       const parsedJSON = response;
       var login: Login[] = parsedJSON as Login[];
       //console.log('MESSAGE: ' +login.message);
       //console.log('STATUS: ' +login.status);
-      //console.log('TOKEN: ' +login.resp);
+      //console.log('TOKEN: ' +login.resp.token);
       if (String(login.status)=='200'){
         token=login.resp.token
         refresh=login.resp.refresh
@@ -82,6 +82,7 @@ class LoginScreen extends React.Component<Props,state> {
     }
   }
   loginCorrecto=()=>{
+    //console.log('subtr '+token.substr(1,token.length-1))
     LOCALSTORAGE.setToken(token)
     LOCALSTORAGE.setRefresh(refresh)
     this.props.navigation.navigate("Home")
