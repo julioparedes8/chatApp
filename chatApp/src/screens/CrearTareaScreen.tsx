@@ -4,7 +4,6 @@ import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
 import DatePicker from 'react-native-datepicker';
 import { CheckBox } from 'react-native-elements'
-import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
@@ -30,21 +29,27 @@ class CrearTareaScreen extends React.Component<Props,state> {
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       usuario='PRUEBACHAT'
     }
+    //actualiza y refleja el valor de datetime fechaCreación
     setDateCreacion(newDate:any) {
         this.setState({ creacionDate: newDate });
     }
+    //actualiza y refleja el valor de datetime fechaExpiración
     setDateExpiracion(newDate:any) {
       this.setState({ expiracionDate: newDate });
     }
+    //actualiza y refleja el valor de combobox Aviso
     comboAviso(selected:string){
       this.setState({selectedAviso: selected})
     }
+    //actualiza y refleja el valor de combobox grupo
     comboGrupo(selected:string){
       this.setState({selectedGrupo: selected})
     }
+    //actualiza y refleja el valor de combobox tipo
     comboTipo(selected:string){
       this.setState({selectedTipo: selected})
     }
+    //crea el diseño de la pantalla
     render(){
           return (
             <Container>

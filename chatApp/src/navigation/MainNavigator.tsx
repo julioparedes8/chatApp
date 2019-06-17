@@ -11,8 +11,8 @@ import LoadingScreen from '../screens/LoadingScreen';
 import CrearTareaScreen from '../screens/CrearTareaScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
-// Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
-// goes here.
+// Implementation para navegar entre pantallas
+//aqui se definen todas las pantallas y se le asigna un nombre con el cual se accedera
 const MainNavigator= createStackNavigator(
   {
       Home:{
@@ -45,9 +45,11 @@ const MainNavigator= createStackNavigator(
       
   },
   {
+    //sin header
     headerMode: 'none'
   }
 )
+//se va iniciar en la pantalla de cargando y despues se navegara basandose en la sesión
 const AppStack = MainNavigator;
 const AuthStack = createStackNavigator({ Login: LoginScreen},{headerMode:'none'});
 export default createAppContainer(createSwitchNavigator(

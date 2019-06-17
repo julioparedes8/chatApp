@@ -17,11 +17,13 @@ export default class LoadingScreen extends React.Component<Props,State>{
         this.state={
             sesion:false
         }
+        //hacemos la petición al local storage para saber si existe la sesión
         LOCALSTORAGE.existToken().then(response=>{
             this.setState({sesion:response})
         })
     }
     componentDidUpdate(){
+        //si existe sesión se navegará al appStack que son las pantallas de la app y si no al authStack que es el login
         this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
     }
     render(){

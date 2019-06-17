@@ -1,3 +1,4 @@
+//interfaz del login
 export interface Login{
     message:String;
     status:Number;

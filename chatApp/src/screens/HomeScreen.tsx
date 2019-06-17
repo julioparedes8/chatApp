@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage, Alert} from 'react-native'
 import api from '../api';
 import localstorage from '../localstorage';
-import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import MessagesScreen from './MessagesScreen';
@@ -15,39 +14,50 @@ export interface Props {
 interface State{
   index?: number
 }
+//variables globales
 let API = new api();
 let LOCALSTORAGE = new localstorage();
 class HomeScreen extends React.Component<Props,State> {
   constructor(props: Props){
     super(props);
-    this.state = {index: 3} // default screen index
+    this.state = {index: 3} // el indice para la pantalla de inicio
   }
-    
+  //aqui se actualiza el indice basandose en la pantalla que se selecciono para navegar  
   switchScreen(index:number) {
     this.setState({index: index})
   }
+  componentWillReceiveProps(){
+    this.setState({index:3})
+  }
+  //abre una alerta para asegurar que se desea cerrar sesón
   cerrarSesion=()=>{
     Alert.alert(
       'Cerrar Sesión',
       '¿Seguro que deseas cerrar sesión?',
       [
+        //si se desea cerrar sesión invoca a la siguiente función
         {text: 'Si', onPress: () => this.salir()},
         {text: 'No', onPress: () =>'cancelar'},
       ],
       {cancelable: false},
     );
   }
+  //se ejecuta al presionar el botton del header de la pantalla de CHATS y te navega a otra pantalla
   enviarMensaje=()=>{
     this.props.navigation.navigate('EnviarMensaje')
   }
+  //se ejecuta al presionar el botton del header de la pantalla de AGENDA y te navega a otra pantalla
   crearTarea=()=>{
     this.props.navigation.navigate('CrearTarea')
   }
+  //cierra sesión, elimina los tokens del LS y te navega a la pantalla del login
   salir=()=>{
     LOCALSTORAGE.borrarToken()
     this.props.navigation.navigate("Login")
+    this.setState({index:3})
   }
-  
+  //Aqui se muestra el footer y basandose en el indice que definimos para cada pantalla
+  // te muestra la que corrsponda
   render(){
     let AppComponent = null;
     let nombre= '';

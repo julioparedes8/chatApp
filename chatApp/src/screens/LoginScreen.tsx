@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList,ImageBackground, Alert} from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage';
 import api from '../api';
 import localstorage from '../localstorage';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
@@ -16,6 +15,7 @@ interface state{
     password?: string,
     modal?: boolean,
 }
+//definimos variables globales
 let API = new api();
 let LOCALSTORAGE = new localstorage();
 let token=""
@@ -30,46 +30,50 @@ class LoginScreen extends React.Component<Props,state> {
       modal:false
     }
   }
-  prueba=()=>{
-    this.mensajeShow('correcto',200)
-  }
-  toggleModal = () => {
-    this.setState({ modal: !this.state.modal });
-  };
+  //sirve para ocultar y mostrar el texto de la contraseña
   ocultarPress = () =>{
     this.setState({ 
       hidden: !this.state.hidden 
     })
   }
+  //se ejecuta al presionar el botonn iniciar sesión
   sesionPress = () =>{
+    //definimos el json de configuración de la api para poder hacer la petición
+    //en los headers van los paramteros base mas el usuario y contraseña
     let config = {
       headers: { 'tenantId':'macropro','Content-Type': 'application/json','codigo':this.state.usuario,'password':this.state.password}
     }
+    //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
     API.sesion('login',config)
     .then(response => {
+      //aqui cachamos la respuesta
       const parsedJSON = response;
       var login: Login[] = parsedJSON as Login[];
       //console.log('MESSAGE: ' +login.message);
-      //console.log('STATUS: ' +login.status);
-      //console.log('TOKEN: ' +login.resp.token);
+      //si es un login correcto asignamos los valores de los tokens
       if (String(login.status)=='200'){
         token=login.resp.token
         refresh=login.resp.refresh
       }
-    this.mensajeShow(login.message,login.status)
+      //llamamos a la siguiente función para mostrar el mensaje del estado del login, se le pasa los parametros del status y mensaje
+      this.mensajeShow(login.message,login.status)
     })
     .catch(error => console.log(error))
   }
+  //se muestra una alerta en base al status del login
   mensajeShow = (mensaje:any,status:any)=>{
+    //si el status es 200 (correcto) se muestra el siguiente mensaje
     if (status==200){
       Alert.alert(
         'Inicio de Sesión',
         'Bienvenido',
         [
+          //al presionar ok se llama la siguiente función
           {text: 'OK', onPress: () => this.loginCorrecto()},
         ],
         {cancelable: false},
       );
+    //si es status 400 (login incorrecto) se meustra el siguiente mensaje
     }else if(status==400){
       Alert.alert(
         'Inicio de Sesión',
@@ -81,6 +85,7 @@ class LoginScreen extends React.Component<Props,state> {
       );
     }
   }
+  //aqui se almacena los tokens en el LS ya que el login fue correcto y te navega a la pantalla principal
   loginCorrecto=()=>{
     //console.log('subtr '+token.substr(1,token.length-1))
     LOCALSTORAGE.setToken(token)

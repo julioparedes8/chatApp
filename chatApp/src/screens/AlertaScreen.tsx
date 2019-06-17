@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage, Alert} from 'react-native'
 import api from '../api';
-import FooterComponent from '../components/Footer'
 import { BaseResponse } from '../entidades/BaseResponse';
 import { Login } from '../entidades/Login';
 import localstorage from '../localstorage';
+import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail } from "native-base";
 export interface Props {
@@ -13,6 +13,7 @@ export interface Props {
 interface State {
   refresh?: String;
   token?:String;
+  macADD?:String
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -25,7 +26,8 @@ class AlertaScreen extends React.Component<Props,State> {
       super(props);
       this.state = {
         token: '',
-        refresh:''
+        refresh:'',
+        macADD:''
       }
     }
     upDateToken(){
@@ -43,6 +45,13 @@ class AlertaScreen extends React.Component<Props,State> {
           headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json' }
         }
       })
+      DeviceInfo.getMACAddress().then(mac => {
+        // "E5:12:D8:E5:69:97"
+        this.setState({macADD:mac})
+      });
+    }
+    componentDidUpdate(){
+      this.upDateToken()
     }
     componentDidMount(){
      this.upDateToken()
@@ -107,22 +116,11 @@ class AlertaScreen extends React.Component<Props,State> {
           'Error',
           mensaje,
           [
-            {text: 'OK', onPress: () => this.cerrarSesion()},
+            {text: 'OK', onPress: () => this.salir()},
           ],
           {cancelable: false},
         );
       }
-    }
-    cerrarSesion=()=>{
-      Alert.alert(
-        'Cerrar Sesión',
-        '¿Seguro que deseas cerrar sesión?',
-        [
-          {text: 'Si', onPress: () => this.salir()},
-          {text: 'No', onPress: () =>'cancelar'},
-        ],
-        {cancelable: false},
-      );
     }
     salir=()=>{
       LOCALSTORAGE.borrarToken()
@@ -167,7 +165,7 @@ class AlertaScreen extends React.Component<Props,State> {
                 </Left>
                 <Body>
                   <Text>Prioridad 3</Text>
-                  <Text note numberOfLines={1}>Esta es una alerta de priordad 3 . .</Text>
+                  <Text note numberOfLines={1}>{this.state.macADD}</Text>
                 </Body>
                 <Right>
                   <Button transparent>

@@ -1,23 +1,26 @@
 import AsyncStorage from '@react-native-community/async-storage';
 class LocalStorage{
+    //guarda el token en el local storage
     setToken=async (token:any)=>{
         try {
-          await AsyncStorage.setItem('Token', JSON.stringify(token))
+          await AsyncStorage.setItem('Token', (token))
           const tkn = await AsyncStorage.getItem('Token')
           console.log(tkn)
         } catch (e) {
           // saving error
         }
     }
+    //guarda el token refresh en el local storage
     setRefresh=async (refresh:any)=>{
         try {
-          await AsyncStorage.setItem('Refresh', JSON.stringify(refresh))
+          await AsyncStorage.setItem('Refresh', (refresh))
           const rfh = await AsyncStorage.getItem('Refresh')
           console.log(rfh)
         } catch (e) {
           // saving error
         }
     }
+    //valida si existe el token en el LS para saber si existe su sesión
     existToken=async ()=>{
         try {
             //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
@@ -48,6 +51,7 @@ class LocalStorage{
       // saving error
       }
     }
+    //elimina los token al cerrar sesión
     borrarToken=async ()=>{
         try {
           await AsyncStorage.removeItem('Token')
@@ -61,6 +65,7 @@ class LocalStorage{
           // saving error
         }
     }
+    //Regresa el token almacenado en el local storage para hacer peticiones 
     getToken=async ()=>{
       try {
           //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
@@ -71,11 +76,12 @@ class LocalStorage{
               return ""
           }
           //this.setState({sesion:true})
-          return tkn.substr(1,tkn.length-2)
+          return tkn
       } catch (e) {
       // saving error
       }
     }
+    //Regresa el token almacenado en el local storage para renovar el toekn
     getRefresh=async ()=>{
       try {
           //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
@@ -86,7 +92,7 @@ class LocalStorage{
               return ""
           }
           //this.setState({sesion:true})
-          return rfs.substr(1,rfs.length-2)
+          return rfs
       } catch (e) {
       // saving error
       }
