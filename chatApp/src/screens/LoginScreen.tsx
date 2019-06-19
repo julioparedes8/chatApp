@@ -5,6 +5,8 @@ import localstorage from '../localstorage';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import { Login } from '../entidades/login';
+import md5 from 'md5';
+import DeviceInfo from 'react-native-device-info';
 export interface Props{
     navigation: NavigationScreenProp<any,any>
 }
@@ -12,8 +14,9 @@ interface state{
     hidden?: boolean;
     loading?: boolean;
     usuario?: string;
-    password?: string,
-    modal?: boolean,
+    password?: string;
+    modal?: boolean;
+    macADD?:String;
 }
 //definimos variables globales
 let API = new api();
@@ -27,8 +30,17 @@ class LoginScreen extends React.Component<Props,state> {
       hidden:true,
       usuario:'',
       password:'',
-      modal:false
+      modal:false,
+      macADD:'',
     }
+    this.obtenerMac()
+  }
+  //obtiene la macAddress
+  obtenerMac(){
+    DeviceInfo.getMACAddress().then(mac => {
+      // "E5:12:D8:E5:69:97"
+      this.setState({macADD:mac})
+    });
   }
   //sirve para ocultar y mostrar el texto de la contraseña
   ocultarPress = () =>{
@@ -41,7 +53,7 @@ class LoginScreen extends React.Component<Props,state> {
     //definimos el json de configuración de la api para poder hacer la petición
     //en los headers van los paramteros base mas el usuario y contraseña
     let config = {
-      headers: { 'tenantId':'macropro','Content-Type': 'application/json','codigo':this.state.usuario,'password':this.state.password}
+      headers: { 'tenantId':'macropro','Content-Type': 'application/json','MacAddress':this.state.macADD,'codigo':this.state.usuario,'password':md5(String(this.state.password))}
     }
     //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
     API.sesion('login',config)

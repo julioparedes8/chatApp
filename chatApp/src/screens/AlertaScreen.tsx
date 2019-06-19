@@ -13,7 +13,7 @@ export interface Props {
 interface State {
   refresh?: String;
   token?:String;
-  macADD?:String
+  macADD?:String;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -29,32 +29,30 @@ class AlertaScreen extends React.Component<Props,State> {
         refresh:'',
         macADD:''
       }
+      DeviceInfo.getMACAddress().then(mac => {
+        // "E5:12:D8:E5:69:97"
+        this.setState({macADD:mac})
+      });
+      this.upDateToken()
     }
     upDateToken(){
       LOCALSTORAGE.getToken().then(response=>{
         this.setState({token:response})
         console.log(this.state.token)
         config = {
-          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token }
+          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
         }
       })
       LOCALSTORAGE.getRefresh().then(response=>{
         this.setState({refresh:response})
         console.log(this.state.refresh)
         config2 = {
-          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json' }
+          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
         }
       })
-      DeviceInfo.getMACAddress().then(mac => {
-        // "E5:12:D8:E5:69:97"
-        this.setState({macADD:mac})
-      });
-    }
-    componentDidUpdate(){
-      this.upDateToken()
     }
     componentDidMount(){
-     this.upDateToken()
+      this.upDateToken()
     }
     peticion = () =>{
       API.getAll('SysTareaRest',config)
@@ -80,9 +78,9 @@ class AlertaScreen extends React.Component<Props,State> {
       if (String(login.status)=='200'){
         token=login.resp.token
         refresh=login.resp.refresh
+        this.refreshCorrecto()
       }
     this.mensajeShow(login.message,login.status)
-    this.refreshCorrecto()
     })
     .catch(error => this.mensajeShow('A signing key must be specified if the specified JWT is digitally signed.','500'))
     }
@@ -111,7 +109,7 @@ class AlertaScreen extends React.Component<Props,State> {
           ],
           {cancelable: false},
         );
-      }else if(status==500){
+      }else if(status==400){
         Alert.alert(
           'Error',
           mensaje,
