@@ -1,16 +1,18 @@
 import React from 'react';
 import { Container, Header, Content, Form, Item, Input, Button,Left,Icon,Body,Right,Title,Text,Label, Textarea, Picker } from 'native-base';
-import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
+import {View,StyleSheet,FlatList, AsyncStorage, Alert} from 'react-native'
 import api from '../api';
 import DatePicker from 'react-native-datepicker';
+import localstorage from '../localstorage';
 import { CheckBox } from 'react-native-elements'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
+import DeviceInfo from 'react-native-device-info';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
 interface state{
-    creacionDate?: any;
-    expiracionDate?: any;
+    creacionDate?: string;
+    expiracionDate?: string;
     selectedAviso?:string;
     selectedGrupo?:string;
     selectedTipo?:string;
@@ -18,16 +20,49 @@ interface state{
     enabled:boolean;
     asunto:string;
     contenido:string;
+    refresh?: String;
+    token?:String;
+    macADD?:String;
 }
 let API = new api();
+let LOCALSTORAGE = new localstorage();
+let config={}
+let config2={}
+let token=""
+let refresh=""
 let usuario:String;
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = { asunto:'',contenido:'',expiracionDate:new Date(),creacionDate: new Date(),selectedAviso:'',selectedGrupo:'',selectedTipo:'',checked: false,enabled: false };
+      this.state = { asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       usuario='PRUEBACHAT'
+      DeviceInfo.getMACAddress().then(mac => {
+        // "E5:12:D8:E5:69:97"
+        this.setState({macADD:mac})
+      });
+      this.upDateToken()
+    }
+    //obtiene mac 
+    upDateToken(){
+      LOCALSTORAGE.getToken().then(response=>{
+        this.setState({token:response})
+        console.log(this.state.token)
+        config = {
+          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+        }
+      })
+      LOCALSTORAGE.getRefresh().then(response=>{
+        this.setState({refresh:response})
+        console.log(this.state.refresh)
+        config2 = {
+          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
+        }
+      })
+    }
+    componentDidMount(){
+      this.upDateToken()
     }
     //actualiza y refleja el valor de datetime fechaCreación
     setDateCreacion(newDate:any) {
@@ -48,6 +83,50 @@ class CrearTareaScreen extends React.Component<Props,state> {
     //actualiza y refleja el valor de combobox tipo
     comboTipo(selected:string){
       this.setState({selectedTipo: selected})
+    }
+    crearTarea=()=>{
+      //validaciones
+      if (this.state.asunto==""){
+        this.mensajeShow("Error","Ingrese asunto",1)
+      } else if (this.state.contenido==""){
+        this.mensajeShow("Error","Ingrese Contenido",1)
+      } else{
+        //hacer peticion
+        this.peticion()
+        this.mensajeShow("Petición Éxitosa",'Se agrego la tarea correctamente' + this.state.creacionDate + " " +this.state.expiracionDate + " " + "aviso: "+this.state.selectedAviso + " Asunto: " + this.state.asunto + " contenido: "+this.state.contenido,2)
+      }
+    }
+    mensajeShow = (titulo:any,mensaje:any,tipo:any)=>{
+      Alert.alert(
+        titulo,
+        mensaje,
+        [
+          {text: 'OK', 
+          onPress: () => ""},
+        ],
+        {cancelable: false},
+      );
+    }
+    peticion(){
+      let data:any={
+        "asunto": this.state.asunto,
+        "contenido": this.state.contenido,
+        "descartada": 0,
+        "fechaCreacion": this.state.creacionDate,
+        "fechaExpiracion": this.state.expiracionDate,
+        "fechaRecordatorio": '2019-06-28',
+        "leido":0,
+        "tipo": this.state.selectedTipo,
+        "creador_id": 1,
+        "destinatario_id": 1,
+      }
+      API.insert('SysTareaRest',data,config)
+      .then(response => {
+      const parsedJSON = response;
+      //const usuario: Usuario = parsedJSON as Usuario;
+      console.log('Objetos regresados: ' +parsedJSON);
+      })
+      .catch(error => console.log(error))
     }
     //crea el diseño de la pantalla
     render(){
@@ -97,8 +176,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           <DatePicker
                             style={{width: 160,marginLeft:13,marginRight:15,marginTop:5,marginBottom:5}}
                             date={this.state.creacionDate}
-                            mode="datetime"
-                            format="YYYY-MM-DD HH:mm"
+                            mode="date"
+                            format="YYYY-MM-DD"
                             confirmBtnText="Ok"
                             cancelBtnText="Cancelar"
                             customStyles={{
@@ -154,14 +233,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                   selectedValue={this.state.selectedAviso}
                                   onValueChange={this.comboAviso.bind(this)}
                                 >
-                                  <Picker.Item label="Al Momento" value="key0" />
-                                  <Picker.Item label="Ninguno" value="key1" />
-                                  <Picker.Item label="1 minuto" value="key2" />
-                                  <Picker.Item label="5 minutos" value="key3" />
-                                  <Picker.Item label="15 minutos" value="key4" />
-                                  <Picker.Item label="30 minutos" value="key5" />
-                                  <Picker.Item label="1 hora" value="key6" />
-                                  <Picker.Item label="2 horas" value="key7" />
+                                  <Picker.Item label="Al Momento" value="Al Momento" />
+                                  <Picker.Item label="Ninguno" value="Ninguno" />
+                                  <Picker.Item label="1 minuto" value="1 minuto" />
+                                  <Picker.Item label="5 minutos" value="5 minutos" />
+                                  <Picker.Item label="15 minutos" value="15 minutos" />
+                                  <Picker.Item label="30 minutos" value="30 minutos" />
+                                  <Picker.Item label="1 hora" value="1 hora" />
+                                  <Picker.Item label="2 horas" value="2 horas" />
                                 </Picker>
                             </Item>
                           </View>
@@ -248,10 +327,10 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 selectedValue={this.state.selectedTipo}
                                 onValueChange={this.comboTipo.bind(this)}
                               >
-                                <Picker.Item label="Llamada" value="key0" />
-                                <Picker.Item label="Reunión" value="key1" />
-                                <Picker.Item label="Correo" value="key2" />
-                                <Picker.Item label="Otro" value="key3" />
+                                <Picker.Item label="Llamada" value="LLAMADA" />
+                                <Picker.Item label="Reunión" value="REUNION" />
+                                <Picker.Item label="Correo" value="CORREO" />
+                                <Picker.Item label="Otro" value="OTRO" />
                               </Picker>
                           </Item>
                           </View>
@@ -266,7 +345,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           <Textarea  onChangeText={(contenido) => this.setState({contenido})} value={this.state.contenido} rowSpan={4} style={{marginRight:5,marginTop:10,marginBottom:10,color: '#616161',height:130,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}} placeholder="" />
                       </View>
                   </View>
-                    <Button rounded block info  style={styles.button} >
+                    <Button rounded block info  style={styles.button} onPress={this.crearTarea} >
                         <Text>Crear Tarea</Text>
                     </Button>
                 </Form>
