@@ -52,30 +52,46 @@ class LoginScreen extends React.Component<Props,state> {
   sesionPress = () =>{
     //definimos el json de configuración de la api para poder hacer la petición
     //en los headers van los paramteros base mas el usuario y contraseña
-    let config = {
-      headers: { 'tenantId':'macropro','Content-Type': 'application/json','MacAddress':this.state.macADD,'codigo':this.state.usuario,'password':md5(String(this.state.password))}
-    }
-    //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
-    API.sesion('login',config)
-    .then(response => {
-      //aqui cachamos la respuesta
-      const parsedJSON = response;
-      var login: Login[] = parsedJSON as Login[];
-      //console.log('MESSAGE: ' +login.message);
-      //si es un login correcto asignamos los valores de los tokens
-      if (String(login.status)=='200'){
-        token=login.resp.token
-        refresh=login.resp.refresh
+    if (this.state.usuario==""){
+      this.mensajeShow("Ingrese usuario",1)
+    } else if (this.state.password==""){
+      this.mensajeShow("Ingrese contraseña",1)
+    }else {
+      let config = {
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','MacAddress':this.state.macADD,'codigo':this.state.usuario,'password':md5(String(this.state.password))}
       }
-      //llamamos a la siguiente función para mostrar el mensaje del estado del login, se le pasa los parametros del status y mensaje
-      this.mensajeShow(login.message,login.status)
-    })
-    .catch(error => console.log(error))
+      //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
+      API.sesion('login',config)
+      .then(response => {
+        //aqui cachamos la respuesta
+        const parsedJSON = response;
+        var login: Login[] = parsedJSON as Login[];
+        //console.log('MESSAGE: ' +login.message);
+        //si es un login correcto asignamos los valores de los tokens
+        if (String(login.status)=='200'){
+          token=login.resp.token
+          refresh=login.resp.refresh
+        }
+        //llamamos a la siguiente función para mostrar el mensaje del estado del login, se le pasa los parametros del status y mensaje
+        this.mensajeShow(login.message,login.status)
+      })
+      .catch(error => this.mensajeShow(error.message,error.status))
+    }
   }
   //se muestra una alerta en base al status del login
   mensajeShow = (mensaje:any,status:any)=>{
     //si el status es 200 (correcto) se muestra el siguiente mensaje
-    if (status==200){
+    if (status==1){
+      Alert.alert(
+        "Error de validación",
+        mensaje,
+        [
+          {text: 'OK', 
+          onPress: () => ""},
+        ],
+        {cancelable: false},
+      );
+    }else if (status==200){
       Alert.alert(
         'Inicio de Sesión',
         'Bienvenido',
@@ -86,7 +102,25 @@ class LoginScreen extends React.Component<Props,state> {
         {cancelable: false},
       );
     //si es status 400 (login incorrecto) se meustra el siguiente mensaje
+    }else if(status==300){
+      Alert.alert(
+        'Inicio de Sesión',
+        mensaje,
+        [
+          {text: 'OK', onPress: () => 'cerrar'},
+        ],
+        {cancelable: false},
+      );
     }else if(status==400){
+      Alert.alert(
+        'Inicio de Sesión',
+        mensaje,
+        [
+          {text: 'OK', onPress: () => 'cerrar'},
+        ],
+        {cancelable: false},
+      );
+    }else if(status==500){
       Alert.alert(
         'Inicio de Sesión',
         mensaje,

@@ -59,13 +59,13 @@ class AlertaScreen extends React.Component<Props,State> {
       .then(response => {
         const parsedJSON = response;
         var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
-        console.log('MESSAGE: ' +baseResponse.message);
-        console.log('STATUS: ' +baseResponse.status);
-        console.log('Resp: ' +baseResponse.resp);
+        //console.log('MESSAGE: ' +baseResponse.message);
+       // console.log('STATUS: ' +baseResponse.status);
+       // console.log('Resp: ' +baseResponse.resp);
         this.mensajeShow(baseResponse.message,baseResponse.status)
         //this.mensajeShow(login.message,login.status)
       })
-      .catch(error => this.mensajeShow('Fallo Autenticacion','401'))
+      .catch(error =>this.mensajeShow(error.message,error.status))
     }
     refresh=()=>{
       API.sesion('refresh',config2)
@@ -82,7 +82,7 @@ class AlertaScreen extends React.Component<Props,State> {
       }
     this.mensajeShow(login.message,login.status)
     })
-    .catch(error => this.mensajeShow('A signing key must be specified if the specified JWT is digitally signed.','500'))
+    .catch(error => this.mensajeShow(error.response.message,error.response.status))
     }
     refreshCorrecto=()=>{
       LOCALSTORAGE.setToken(token)
@@ -100,12 +100,12 @@ class AlertaScreen extends React.Component<Props,State> {
           ],
           {cancelable: false},
         );
-      }else if(status==401){
+      }else if(status==300){
         Alert.alert(
           'Error',
           mensaje,
           [
-            {text: 'OK', onPress: () => this.refresh()},
+            {text: 'OK', onPress: () => ''},
           ],
           {cancelable: false},
         );
@@ -115,6 +115,24 @@ class AlertaScreen extends React.Component<Props,State> {
           mensaje,
           [
             {text: 'OK', onPress: () => this.salir()},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==401){
+        Alert.alert(
+          'Error',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => this.refresh()},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==500){
+        Alert.alert(
+          'Error',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => ''},
           ],
           {cancelable: false},
         );

@@ -9,11 +9,36 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                resolve(response.data.resp)
+                resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                //console.log(error.response)
+                if(error.response.status==400){
+                    console.log(error.response)
+                    let err400={
+                        response:{
+                            data:{
+                                status:"400",
+                                message:"Petición Incorrecta"
+                            }
+                        }
+                    }
+                    reject(err400.response.data)
+                }else if(error.response.status==500){
+                    console.log(error.response)
+                    let err500={
+                        response:{
+                            data:{
+                                status:"500",
+                                message:"Error interno del Servidor"
+                            }
+                        }
+                    }
+                    reject(err500.response.data)
+                }else{
+                    reject(error.response.data)
+                }
+                //return error;
             });
         })
     }
@@ -22,12 +47,32 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
+                console.log(response.data)
                 resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error.message);
-                reject('401')
+                //console.log(error.response
                 //return error;
+                if(error.response.status=='400'){
+                    console.log(error.response)
+                    let err={
+                        message:'Petición Incorrecta',
+                        status:'400'
+                    }
+                    reject(err)
+                }else if(error.response.status=='500'){
+                    let err={
+                        message:'Error interno del servidor',
+                        status:'500'
+                    }
+                    reject(err)
+                }else if (error.response.status=='401'){
+                    let err={
+                        message:'Fallo autenticación',
+                        status:'401'
+                    }
+                    reject(err)
+                }
             });
         })
     }
@@ -36,12 +81,32 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.post(url.concat( tablaRest ),data ,headers)
             .then(function (response) {
-                resolve(response.data.resp)
+                console.log(response.data)
+                resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                //console.log(error.response
                 //return error;
+                if(error.response.status=='400'){
+                    console.log(error.response)
+                    let err={
+                        message:'Petición Incorrecta',
+                        status:'400'
+                    }
+                    reject(err)
+                }else if(error.response.status=='500'){
+                    let err={
+                        message:'Error interno del servidor',
+                        status:'500'
+                    }
+                    reject(err)
+                }else if (error.response.status=='401'){
+                    let err={
+                        message:'Fallo autenticación',
+                        status:'401'
+                    }
+                    reject(err)
+                }
             });
         })
     }
@@ -50,12 +115,31 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.post(url.concat( tablaRest ),data ,headers)
             .then(function (response) {
-                resolve(response.data.resp)
+                resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                //console.log(error.response
                 //return error;
+                if(error.response.status=='400'){
+                    console.log(error.response)
+                    let err={
+                        message:'Petición Incorrecta',
+                        status:'400'
+                    }
+                    reject(err)
+                }else if(error.response.status=='500'){
+                    let err={
+                        message:'Error interno del servidor',
+                        status:'500'
+                    }
+                    reject(err)
+                }else if (error.response.status=='401'){
+                    let err={
+                        message:'Fallo autenticación',
+                        status:'401'
+                    }
+                    reject(err)
+                }
             });
         })
     }
@@ -64,12 +148,31 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.delete(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                resolve(response.data.resp)
+                resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                //console.log(error.response
                 //return error;
+                if(error.response.status=='400'){
+                    console.log(error.response)
+                    let err={
+                        message:'Petición Incorrecta',
+                        status:'400'
+                    }
+                    reject(err)
+                }else if(error.response.status=='500'){
+                    let err={
+                        message:'Error interno del servidor',
+                        status:'500'
+                    }
+                    reject(err)
+                }else if (error.response.status=='401'){
+                    let err={
+                        message:'Fallo autenticación',
+                        status:'401'
+                    }
+                    reject(err)
+                }
             });
         })
     }
@@ -81,9 +184,28 @@ class Api{
                 resolve(response.data)
             })
             .catch(function (error) {
-                console.log(error);
-                reject('error')
+                //console.log(error.response
                 //return error;
+                if(error.response.status=='400'){
+                    console.log(error.response)
+                    let err={
+                        message:'Petición Incorrecta',
+                        status:'400'
+                    }
+                    reject(err)
+                }else if(error.response.status=='500'){
+                    let err={
+                        message:'Error interno del servidor',
+                        status:'500'
+                    }
+                    reject(err)
+                }else if (error.response.status=='401'){
+                    let err={
+                        message:'Fallo autenticación',
+                        status:'401'
+                    }
+                    reject(err)
+                }
             });
         })
     }

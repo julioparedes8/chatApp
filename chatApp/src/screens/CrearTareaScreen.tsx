@@ -7,6 +7,8 @@ import localstorage from '../localstorage';
 import { CheckBox } from 'react-native-elements'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import DeviceInfo from 'react-native-device-info';
+import { BaseResponse } from '../entidades/BaseResponse';
+import { Login } from '../entidades/login';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -61,6 +63,29 @@ class CrearTareaScreen extends React.Component<Props,state> {
         }
       })
     }
+    refresh=()=>{
+      API.sesion('refresh',config2)
+    .then(response => {
+      const parsedJSON = response;
+      var login: Login[] = parsedJSON as Login[];
+      //console.log('MESSAGE: ' +login.message);
+      //console.log('STATUS: ' +login.status);
+      //console.log('TOKEN: ' +login.resp);
+      if (String(login.status)=='200'){
+        token=login.resp.token
+        refresh=login.resp.refresh
+        this.refreshCorrecto()
+      }
+    this.mensajeShow(login.message,login.status)
+    })
+    .catch(error => this.mensajeShow(error.response.message,error.response.status))
+    }
+    refreshCorrecto=()=>{
+      LOCALSTORAGE.setToken(token)
+      LOCALSTORAGE.setRefresh(refresh)
+      this.upDateToken()
+      //this.peticion()
+    }
     componentDidMount(){
       this.upDateToken()
     }
@@ -87,25 +112,78 @@ class CrearTareaScreen extends React.Component<Props,state> {
     crearTarea=()=>{
       //validaciones
       if (this.state.asunto==""){
-        this.mensajeShow("Error","Ingrese asunto",1)
+        this.mensajeShow("Ingrese asunto",1)
       } else if (this.state.contenido==""){
-        this.mensajeShow("Error","Ingrese Contenido",1)
+        this.mensajeShow("Ingrese Contenido",1)
       } else{
         //hacer peticion
         this.peticion()
-        this.mensajeShow("Petición Éxitosa",'Se agrego la tarea correctamente' + this.state.creacionDate + " " +this.state.expiracionDate + " " + "aviso: "+this.state.selectedAviso + " Asunto: " + this.state.asunto + " contenido: "+this.state.contenido,2)
       }
     }
-    mensajeShow = (titulo:any,mensaje:any,tipo:any)=>{
-      Alert.alert(
-        titulo,
-        mensaje,
-        [
-          {text: 'OK', 
-          onPress: () => ""},
-        ],
-        {cancelable: false},
-      );
+    mensajeShow = (mensaje:any,status:any)=>{
+      if (status==1){
+        Alert.alert(
+          "Error de validación",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => ""},
+          ],
+          {cancelable: false},
+        );
+      } else if (status==200){
+        Alert.alert(
+          "Petición Éxitosa",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => ""},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==300){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==400){
+        Alert.alert(
+          "Error",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () =>this.salir()},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==401){
+        Alert.alert(
+          "Error",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () =>  this.refresh()},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==500){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }
+    }
+    salir=()=>{
+      LOCALSTORAGE.borrarToken()
+      this.props.navigation.navigate("Login")
     }
     peticion(){
       let data:any={
@@ -123,10 +201,11 @@ class CrearTareaScreen extends React.Component<Props,state> {
       API.insert('SysTareaRest',data,config)
       .then(response => {
       const parsedJSON = response;
-      //const usuario: Usuario = parsedJSON as Usuario;
-      console.log('Objetos regresados: ' +parsedJSON);
+      var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+      console.log(baseResponse.status);
+      this.mensajeShow(baseResponse.message,baseResponse.status)
       })
-      .catch(error => console.log(error))
+      .catch(error => this.mensajeShow(error.message,error.status))
     }
     //crea el diseño de la pantalla
     render(){
