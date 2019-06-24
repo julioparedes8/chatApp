@@ -20,6 +20,16 @@ class LocalStorage{
           // saving error
         }
     }
+        //guarda el token en el local storage
+    setIdUsuario=async (id:any)=>{
+          try {
+            await AsyncStorage.setItem('IdUsuario', (id))
+            const unico = await AsyncStorage.getItem('IdUsuario')
+            console.log("localStorage id: "+unico)
+          } catch (e) {
+            // saving error
+          }
+      }
     //valida si existe el token en el LS para saber si existe su sesión
     existToken=async ()=>{
         try {
@@ -65,6 +75,16 @@ class LocalStorage{
           // saving error
         }
     }
+        //elimina el id del usuario 
+      borrarIdUsuario=async ()=>{
+          try {
+            await AsyncStorage.removeItem('IdUsuario')
+            const unico = await AsyncStorage.getItem('IdUsuario')
+            console.log(unico)
+          } catch (e) {
+            // saving error
+          }
+      }
     //Regresa el token almacenado en el local storage para hacer peticiones 
     getToken=async ()=>{
       try {
@@ -93,6 +113,22 @@ class LocalStorage{
           }
           //this.setState({sesion:true})
           return rfs
+      } catch (e) {
+      // saving error
+      }
+    }
+    //Regresa el id almacenado en el local storage
+    getIdUsuario=async ()=>{
+      try {
+          //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
+          const id = await AsyncStorage.getItem('IdUsuario')
+          //console.log(rfs)
+          if (id==null){
+              //this.setState({sesion:false})
+              return ""
+          }
+          //this.setState({sesion:true})
+          return id
       } catch (e) {
       // saving error
       }

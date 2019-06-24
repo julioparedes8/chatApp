@@ -7,6 +7,9 @@ import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,It
 import { Login } from '../entidades/login';
 import md5 from 'md5';
 import DeviceInfo from 'react-native-device-info';
+import { Usuario } from '../entidades/Usuario';
+import { BaseResponse } from '../entidades/BaseResponse';
+import LocalStorage from '../localstorage';
 export interface Props{
     navigation: NavigationScreenProp<any,any>
 }
@@ -23,6 +26,7 @@ let API = new api();
 let LOCALSTORAGE = new localstorage();
 let token=""
 let refresh=""
+let id="";
 class LoginScreen extends React.Component<Props,state> {
   constructor(props: Readonly<Props>){
     super(props);
@@ -97,7 +101,7 @@ class LoginScreen extends React.Component<Props,state> {
         'Bienvenido',
         [
           //al presionar ok se llama la siguiente función
-          {text: 'OK', onPress: () => this.loginCorrecto()},
+          {text: 'OK', onPress: () => this.getUsuario()},
         ],
         {cancelable: false},
       );
@@ -136,7 +140,29 @@ class LoginScreen extends React.Component<Props,state> {
     //console.log('subtr '+token.substr(1,token.length-1))
     LOCALSTORAGE.setToken(token)
     LOCALSTORAGE.setRefresh(refresh)
+    LOCALSTORAGE.setIdUsuario(id)
     this.props.navigation.navigate("Home")
+  }
+  getUsuario(){
+    console.log("entro");
+    let config = {
+      headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+token,'MacAddress':this.state.macADD,'codigo':this.state.usuario}
+    }
+    //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
+    API.getAll('UsuarioRest/getUsuarioByCodigo',config)
+    .then(response => {
+      const parsedJSON = response;
+        var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+      console.log(response);
+      //si es un login correcto asignamos los valores de los tokens
+      if (String(baseResponse.status)=='200'){
+        id=baseResponse.resp.id
+        console.log("id: " +id)
+        this.loginCorrecto()
+      }
+      //llamamos a la siguiente función para guardar id en localStorage
+    })
+    .catch(error => this.mensajeShow(error.message,error.status))
   }
   render() {
     return (

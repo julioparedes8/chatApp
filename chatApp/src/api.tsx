@@ -47,7 +47,7 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                console.log(response.data)
+                //console.log(response.data)
                 resolve(response.data)
             })
             .catch(function (error) {

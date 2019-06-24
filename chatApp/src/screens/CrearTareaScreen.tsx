@@ -25,6 +25,7 @@ interface state{
     refresh?: String;
     token?:String;
     macADD?:String;
+    id?:String;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -36,7 +37,7 @@ let usuario:String;
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = { asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+      this.state = { id:'',asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       usuario='PRUEBACHAT'
@@ -51,17 +52,22 @@ class CrearTareaScreen extends React.Component<Props,state> {
       LOCALSTORAGE.getToken().then(response=>{
         this.setState({token:response})
         console.log(this.state.token)
-        config = {
-          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-        }
       })
+      LOCALSTORAGE.getIdUsuario().then(response=>{
+        console.log(response)
+        this.setState({id:response})
+        console.log(this.state.id)
+      })
+      config = {
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+      }
       LOCALSTORAGE.getRefresh().then(response=>{
         this.setState({refresh:response})
         console.log(this.state.refresh)
-        config2 = {
-          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
-        }
       })
+      config2 = {
+        headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
+      }
     }
     refresh=()=>{
       API.sesion('refresh',config2)
@@ -195,7 +201,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
         "fechaRecordatorio": '2019-06-28',
         "leido":0,
         "tipo": this.state.selectedTipo,
-        "creador_id": 1,
+        "creador_id": this.state.id,
         "destinatario_id": 1,
       }
       API.insert('SysTareaRest',data,config)

@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@react-native-community/async-storage": "^1.4.0",
+    "@react-native-community/async-storage": "^1.5.0",
     "@types/md5": "^2.1.33",
     "@types/react-native-calendars": "^1.20.6",
     "@types/react-native-datepicker": "^1.7.0",

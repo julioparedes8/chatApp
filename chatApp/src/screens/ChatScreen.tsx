@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
 import { GiftedChat } from 'react-native-gifted-chat';
-import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 export interface Props {
@@ -18,7 +17,6 @@ interface Messages {
     text: string;
     createdAt: Date;
     user:User;
-
 }
 interface state{
   messages?:Messages[];
@@ -36,6 +34,16 @@ class ChatScreen extends React.Component<Props,state> {
         messages: [
           {
             _id: 1,
+            text: "Como estas?",
+            createdAt: new Date(),
+            user: {
+              _id: 2,
+              name: "React Native",
+              avatar: "https://placeimg.com/140/140/any"
+            }
+          },
+          {
+            _id: 2,
             text: "Hello developer",
             createdAt: new Date(),
             user: {
@@ -43,7 +51,7 @@ class ChatScreen extends React.Component<Props,state> {
               name: "React Native",
               avatar: "https://placeimg.com/140/140/any"
             }
-          }
+          },
         ]
       })
     }
