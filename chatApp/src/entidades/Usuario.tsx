@@ -3,6 +3,6 @@ export interface Usuario{
     message:String;
     status:Number;
     resp:{
-        id: number;
+        id: String;
     };
 }

@@ -27,6 +27,7 @@ let LOCALSTORAGE = new localstorage();
 let token=""
 let refresh=""
 let id="";
+let usuario="";
 class LoginScreen extends React.Component<Props,state> {
   constructor(props: Readonly<Props>){
     super(props);
@@ -139,8 +140,9 @@ class LoginScreen extends React.Component<Props,state> {
   loginCorrecto=()=>{
     //console.log('subtr '+token.substr(1,token.length-1))
     LOCALSTORAGE.setToken(token)
+    LOCALSTORAGE.setIdUsuario(id.toString())
+    LOCALSTORAGE.setUsuario(usuario.toString())
     LOCALSTORAGE.setRefresh(refresh)
-    LOCALSTORAGE.setIdUsuario(id)
     this.props.navigation.navigate("Home")
   }
   getUsuario(){
@@ -158,6 +160,8 @@ class LoginScreen extends React.Component<Props,state> {
       if (String(baseResponse.status)=='200'){
         id=baseResponse.resp.id
         console.log("id: " +id)
+        usuario=baseResponse.resp.codigo
+        console.log("usuario: " +usuario)
         this.loginCorrecto()
       }
       //llamamos a la siguiente función para guardar id en localStorage

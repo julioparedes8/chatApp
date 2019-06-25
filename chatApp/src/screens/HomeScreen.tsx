@@ -52,8 +52,7 @@ class HomeScreen extends React.Component<Props,State> {
   }
   //cierra sesión, elimina los tokens del LS y te navega a la pantalla del login
   salir=()=>{
-    LOCALSTORAGE.borrarToken()
-    LOCALSTORAGE.borrarIdUsuario()
+    LOCALSTORAGE.borrarSesion()
     this.props.navigation.navigate("Login")
     this.setState({index:3})
   }

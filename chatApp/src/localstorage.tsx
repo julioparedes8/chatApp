@@ -20,7 +20,7 @@ class LocalStorage{
           // saving error
         }
     }
-        //guarda el token en el local storage
+    //guarda el token en el local storage
     setIdUsuario=async (id:any)=>{
           try {
             await AsyncStorage.setItem('IdUsuario', (id))
@@ -29,7 +29,17 @@ class LocalStorage{
           } catch (e) {
             // saving error
           }
+    }
+    //guarda el token en el local storage
+    setUsuario=async (user:any)=>{
+      try {
+        await AsyncStorage.setItem('Usuario', (user))
+        const usuario = await AsyncStorage.getItem('Usuario')
+        console.log("usuario: "+usuario)
+      } catch (e) {
+        // saving error
       }
+    }
     //valida si existe el token en el LS para saber si existe su sesión
     existToken=async ()=>{
         try {
@@ -62,21 +72,27 @@ class LocalStorage{
       }
     }
     //elimina los token al cerrar sesión
-    borrarToken=async ()=>{
+    borrarSesion=async ()=>{
         try {
           await AsyncStorage.removeItem('Token')
           await AsyncStorage.removeItem('Refresh')
+          await AsyncStorage.removeItem('IdUsuario')
+          await AsyncStorage.removeItem('Usuario')
           console.log('ya se removio')
           const tkn = await AsyncStorage.getItem('Token')
           console.log(tkn)
           const rhs = await AsyncStorage.getItem('Refresh')
           console.log(rhs)
+          const unico = await AsyncStorage.getItem('IdUsuario')
+          console.log(unico)
+          const user = await AsyncStorage.getItem('Usuario')
+          console.log(user)
         } catch (e) {
           // saving error
         }
     }
-        //elimina el id del usuario 
-      borrarIdUsuario=async ()=>{
+    //elimina el id del usuario 
+    borrarIdUsuario=async ()=>{
           try {
             await AsyncStorage.removeItem('IdUsuario')
             const unico = await AsyncStorage.getItem('IdUsuario')
@@ -84,7 +100,17 @@ class LocalStorage{
           } catch (e) {
             // saving error
           }
-      }
+    }
+    //elimina el usuario 
+    borrarUsuario=async ()=>{
+        try {
+            await AsyncStorage.removeItem('Usuario')
+            const user = await AsyncStorage.getItem('Usuario')
+            console.log(user)
+        } catch (e) {
+            // saving error
+          }
+    }
     //Regresa el token almacenado en el local storage para hacer peticiones 
     getToken=async ()=>{
       try {
@@ -132,6 +158,22 @@ class LocalStorage{
       } catch (e) {
       // saving error
       }
+    }
+    //Regresa el usuario almacenado en el local storage
+    getUsuario=async ()=>{
+          try {
+              //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
+              const user = await AsyncStorage.getItem('Usuario')
+              //console.log(rfs)
+              if (user==null){
+                  //this.setState({sesion:false})
+                  return ""
+              }
+              //this.setState({sesion:true})
+              return user
+          } catch (e) {
+          // saving error
+          }
     }
 }
 export default LocalStorage;

@@ -26,6 +26,7 @@ interface state{
     token?:String;
     macADD?:String;
     id?:String;
+    usuario?:String;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -33,42 +34,49 @@ let config={}
 let config2={}
 let token=""
 let refresh=""
-let usuario:String;
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = { id:'',asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+      this.state = {usuario:'', id:'',asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
-      usuario='PRUEBACHAT'
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
         this.setState({macADD:mac})
       });
       this.upDateToken()
     }
-    //obtiene mac 
+    //obtiene mac
+    //actualiza el token,refresh,id,usuario obteniendolo del local storage 
     upDateToken(){
       LOCALSTORAGE.getToken().then(response=>{
         this.setState({token:response})
         console.log(this.state.token)
+        config = {
+          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+        }
+      })
+      LOCALSTORAGE.getRefresh().then(response=>{
+        this.setState({refresh:response})
+        console.log(this.state.refresh)
+        config2 = {
+          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
+        }
       })
       LOCALSTORAGE.getIdUsuario().then(response=>{
         console.log(response)
         this.setState({id:response})
         console.log(this.state.id)
       })
-      config = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-      }
-      LOCALSTORAGE.getRefresh().then(response=>{
-        this.setState({refresh:response})
-        console.log(this.state.refresh)
+      LOCALSTORAGE.getUsuario().then(response=>{
+        console.log(response)
+        this.setState({usuario:response})
+        console.log(this.state.usuario)
       })
-      config2 = {
-        headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
-      }
     }
+    //peticion para hacer el refresh por que se vencio el token
+    //si el status es 200 entonces llama otra funcion  para actualizar los tokens
+    //si es 400 significa que ya se venció el refresh tambien y procede a mostrar el porque y cierra sesión automaticamente
     refresh=()=>{
       API.sesion('refresh',config2)
     .then(response => {
@@ -81,17 +89,24 @@ class CrearTareaScreen extends React.Component<Props,state> {
         token=login.resp.token
         refresh=login.resp.refresh
         this.refreshCorrecto()
+      }else if (String(login.status)=='400'){
+        this.mensajeShow(login.message,login.status)
       }
-    this.mensajeShow(login.message,login.status)
     })
     .catch(error => this.mensajeShow(error.response.message,error.response.status))
     }
+    //actualiza los tokens en el local storage y despues en el mismo componente
     refreshCorrecto=()=>{
       LOCALSTORAGE.setToken(token)
       LOCALSTORAGE.setRefresh(refresh)
       this.upDateToken()
-      //this.peticion()
+      //this.upDateToken()
+      config = {
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+token,'MacAddress':this.state.macADD }
+      }
+      this.peticion()
     }
+    //actualiza variables cuando se monta el componentev
     componentDidMount(){
       this.upDateToken()
     }
@@ -115,6 +130,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
     comboTipo(selected:string){
       this.setState({selectedTipo: selected})
     }
+    //validaciones
     crearTarea=()=>{
       //validaciones
       if (this.state.asunto==""){
@@ -126,6 +142,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
         this.peticion()
       }
     }
+    //muestra mensajes/alertas dependiendo de status ya sea de peticion o de validacion
     mensajeShow = (mensaje:any,status:any)=>{
       if (status==1){
         Alert.alert(
@@ -139,11 +156,11 @@ class CrearTareaScreen extends React.Component<Props,state> {
         );
       } else if (status==200){
         Alert.alert(
-          "Petición Éxitosa",
+          "Tarea agregada exitosamente",
           mensaje,
           [
             {text: 'OK', 
-            onPress: () => ""},
+            onPress: () => this.limpiar()},
           ],
           {cancelable: false},
         );
@@ -167,15 +184,16 @@ class CrearTareaScreen extends React.Component<Props,state> {
           {cancelable: false},
         );
       }else if (status==401){
-        Alert.alert(
-          "Error",
-          mensaje,
-          [
-            {text: 'OK', 
-            onPress: () =>  this.refresh()},
-          ],
-          {cancelable: false},
-        );
+        //Alert.alert(
+          //"Error",
+          //mensaje,
+          //[
+            //{text: 'OK', 
+            //onPress: () =>  this.refresh()},
+          //],
+          //{cancelable: false},
+        //);
+        this.refresh()
       }else if(status==500){
         Alert.alert(
           'Inicio de Sesión',
@@ -187,10 +205,19 @@ class CrearTareaScreen extends React.Component<Props,state> {
         );
       }
     }
+    //se vencio la sesión por lo tanto se redirigera a iniciar sesión
     salir=()=>{
-      LOCALSTORAGE.borrarToken()
+      LOCALSTORAGE.borrarSesion()
       this.props.navigation.navigate("Login")
     }
+    //limpiar variable cuando ya se agrego correctamente
+    limpiar=()=>{
+      this.setState({
+        asunto:'',
+        contenido:''
+      })
+    }
+    //realiza la petición para hacer el insert de la tarea
     peticion(){
       let data:any={
         "asunto": this.state.asunto,
@@ -201,15 +228,19 @@ class CrearTareaScreen extends React.Component<Props,state> {
         "fechaRecordatorio": '2019-06-28',
         "leido":0,
         "tipo": this.state.selectedTipo,
-        "creador_id": this.state.id,
-        "destinatario_id": 1,
+        "creador":{
+          "id": this.state.id
+        },
+        "destinatario": {
+          "id":1
+        },
       }
       API.insert('SysTareaRest',data,config)
       .then(response => {
       const parsedJSON = response;
       var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
       console.log(baseResponse.status);
-      this.mensajeShow(baseResponse.message,baseResponse.status)
+      this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
       })
       .catch(error => this.mensajeShow(error.message,error.status))
     }
@@ -396,7 +427,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                       <View style={{ flexDirection: 'column',alignItems:'center'}}>
                         <View  style={{ flexDirection: 'row',alignItems: 'flex-start'}}>
                           <Text style={{marginLeft:5,marginTop:16,marginBottom:16}}>Creador :</Text>
-                          <Text style={{fontWeight: 'bold',marginTop:16,marginBottom:16}} >{usuario}</Text>
+                          <Text style={{fontWeight: 'bold',marginTop:16,marginBottom:16}} >{this.state.usuario}</Text>
                         </View >
                         <View style={{ flexDirection: 'row',width:200}}>
                         <Text style={{marginLeft:10,marginTop:16,marginBottom:16}}>Tipo:</Text>

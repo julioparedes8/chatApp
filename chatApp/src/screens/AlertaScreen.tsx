@@ -139,7 +139,7 @@ class AlertaScreen extends React.Component<Props,State> {
       }
     }
     salir=()=>{
-      LOCALSTORAGE.borrarToken()
+      LOCALSTORAGE.borrarSesion()
       this.props.navigation.navigate("Login")
     }
     render() {
