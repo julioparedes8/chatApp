@@ -9,6 +9,7 @@ import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import DeviceInfo from 'react-native-device-info';
 import { BaseResponse } from '../entidades/BaseResponse';
 import { Login } from '../entidades/login';
+import { SysGrupo } from '../entidades/SysGrupo';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -32,6 +33,7 @@ let API = new api();
 let LOCALSTORAGE = new localstorage();
 let config={}
 let config2={}
+let config3={}
 let token=""
 let refresh=""
 class CrearTareaScreen extends React.Component<Props,state> {
@@ -44,205 +46,44 @@ class CrearTareaScreen extends React.Component<Props,state> {
         // "E5:12:D8:E5:69:97"
         this.setState({macADD:mac})
       });
-      this.upDateToken()
+      //this.upDateToken()
     }
     //obtiene mac
     //actualiza el token,refresh,id,usuario obteniendolo del local storage 
     upDateToken(){
-      LOCALSTORAGE.getToken().then(response=>{
-        this.setState({token:response})
-        console.log(this.state.token)
-        config = {
-          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-        }
-      })
-      LOCALSTORAGE.getRefresh().then(response=>{
-        this.setState({refresh:response})
-        console.log(this.state.refresh)
-        config2 = {
-          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
-        }
-      })
-      LOCALSTORAGE.getIdUsuario().then(response=>{
-        console.log(response)
-        this.setState({id:response})
-        console.log(this.state.id)
-      })
-      LOCALSTORAGE.getUsuario().then(response=>{
-        console.log(response)
-        this.setState({usuario:response})
-        console.log(this.state.usuario)
-      })
-    }
-    //peticion para hacer el refresh por que se vencio el token
-    //si el status es 200 entonces llama otra funcion  para actualizar los tokens
-    //si es 400 significa que ya se venció el refresh tambien y procede a mostrar el porque y cierra sesión automaticamente
-    refresh=()=>{
-      API.sesion('refresh',config2)
-    .then(response => {
-      const parsedJSON = response;
-      var login: Login[] = parsedJSON as Login[];
-      //console.log('MESSAGE: ' +login.message);
-      //console.log('STATUS: ' +login.status);
-      //console.log('TOKEN: ' +login.resp);
-      if (String(login.status)=='200'){
-        token=login.resp.token
-        refresh=login.resp.refresh
-        this.refreshCorrecto()
-      }else if (String(login.status)=='400'){
-        this.mensajeShow(login.message,login.status)
-      }
-    })
-    .catch(error => this.mensajeShow(error.response.message,error.response.status))
-    }
-    //actualiza los tokens en el local storage y despues en el mismo componente
-    refreshCorrecto=()=>{
-      LOCALSTORAGE.setToken(token)
-      LOCALSTORAGE.setRefresh(refresh)
-      this.upDateToken()
-      //this.upDateToken()
-      config = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+token,'MacAddress':this.state.macADD }
-      }
-      this.peticion()
+      return new Promise((resolve, reject) => {
+        LOCALSTORAGE.getToken().then(response=>{
+          this.setState({token:response})
+          console.log(this.state.token)
+          config = {
+            headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+          }
+        })
+        LOCALSTORAGE.getRefresh().then(response=>{
+          this.setState({refresh:response})
+          console.log(this.state.refresh)
+          config2 = {
+            headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
+          }
+        })
+        LOCALSTORAGE.getIdUsuario().then(response=>{
+          console.log(response)
+          this.setState({id:response})
+          console.log(this.state.id)
+        })
+        LOCALSTORAGE.getUsuario().then(response=>{
+          console.log(response)
+          this.setState({usuario:response})
+          console.log(this.state.usuario)
+          resolve();
+        })
+      });
     }
     //actualiza variables cuando se monta el componentev
     componentDidMount(){
-      this.upDateToken()
-    }
-    //actualiza y refleja el valor de datetime fechaCreación
-    setDateCreacion(newDate:any) {
-        this.setState({ creacionDate: newDate });
-    }
-    //actualiza y refleja el valor de datetime fechaExpiración
-    setDateExpiracion(newDate:any) {
-      this.setState({ expiracionDate: newDate });
-    }
-    //actualiza y refleja el valor de combobox Aviso
-    comboAviso(selected:string){
-      this.setState({selectedAviso: selected})
-    }
-    //actualiza y refleja el valor de combobox grupo
-    comboGrupo(selected:string){
-      this.setState({selectedGrupo: selected})
-    }
-    //actualiza y refleja el valor de combobox tipo
-    comboTipo(selected:string){
-      this.setState({selectedTipo: selected})
-    }
-    //validaciones
-    crearTarea=()=>{
-      //validaciones
-      if (this.state.asunto==""){
-        this.mensajeShow("Ingrese asunto",1)
-      } else if (this.state.contenido==""){
-        this.mensajeShow("Ingrese Contenido",1)
-      } else{
-        //hacer peticion
-        this.peticion()
-      }
-    }
-    //muestra mensajes/alertas dependiendo de status ya sea de peticion o de validacion
-    mensajeShow = (mensaje:any,status:any)=>{
-      if (status==1){
-        Alert.alert(
-          "Error de validación",
-          mensaje,
-          [
-            {text: 'OK', 
-            onPress: () => ""},
-          ],
-          {cancelable: false},
-        );
-      } else if (status==200){
-        Alert.alert(
-          "Tarea agregada exitosamente",
-          mensaje,
-          [
-            {text: 'OK', 
-            onPress: () => this.limpiar()},
-          ],
-          {cancelable: false},
-        );
-      }else if(status==300){
-        Alert.alert(
-          'Inicio de Sesión',
-          mensaje,
-          [
-            {text: 'OK', onPress: () => 'cerrar'},
-          ],
-          {cancelable: false},
-        );
-      }else if (status==400){
-        Alert.alert(
-          "Error",
-          mensaje,
-          [
-            {text: 'OK', 
-            onPress: () =>this.salir()},
-          ],
-          {cancelable: false},
-        );
-      }else if (status==401){
-        //Alert.alert(
-          //"Error",
-          //mensaje,
-          //[
-            //{text: 'OK', 
-            //onPress: () =>  this.refresh()},
-          //],
-          //{cancelable: false},
-        //);
-        this.refresh()
-      }else if(status==500){
-        Alert.alert(
-          'Inicio de Sesión',
-          mensaje,
-          [
-            {text: 'OK', onPress: () => 'cerrar'},
-          ],
-          {cancelable: false},
-        );
-      }
-    }
-    //se vencio la sesión por lo tanto se redirigera a iniciar sesión
-    salir=()=>{
-      LOCALSTORAGE.borrarSesion()
-      this.props.navigation.navigate("Login")
-    }
-    //limpiar variable cuando ya se agrego correctamente
-    limpiar=()=>{
-      this.setState({
-        asunto:'',
-        contenido:''
-      })
-    }
-    //realiza la petición para hacer el insert de la tarea
-    peticion(){
-      let data:any={
-        "asunto": this.state.asunto,
-        "contenido": this.state.contenido,
-        "descartada": 0,
-        "fechaCreacion": this.state.creacionDate,
-        "fechaExpiracion": this.state.expiracionDate,
-        "fechaRecordatorio": '2019-06-28',
-        "leido":0,
-        "tipo": this.state.selectedTipo,
-        "creador":{
-          "id": this.state.id
-        },
-        "destinatario": {
-          "id":1
-        },
-      }
-      API.insert('SysTareaRest',data,config)
-      .then(response => {
-      const parsedJSON = response;
-      var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
-      console.log(baseResponse.status);
-      this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
-      })
-      .catch(error => this.mensajeShow(error.message,error.status))
+      //carga el estado para despues hacer la peticion de los grupos
+      this.upDateToken().then(res => this.getGrupoUsuario());
+      //this.getGrupoUsuario()
     }
     //crea el diseño de la pantalla
     render(){
@@ -469,6 +310,201 @@ class CrearTareaScreen extends React.Component<Props,state> {
             </Container>
           )
     }
+    //validaciones
+    crearTarea=()=>{
+          //validaciones
+          if (this.state.asunto==""){
+            this.mensajeShow("Ingrese asunto",1)
+          } else if (this.state.contenido==""){
+            this.mensajeShow("Ingrese Contenido",1)
+          } else{
+            //hacer peticion
+            console.log('aqui lo llamo es amadre')
+            this.peticion()
+          }
+    }
+        //peticion para hacer el refresh por que se vencio el token
+    //si el status es 200 entonces llama otra funcion  para actualizar los tokens
+    //si es 400 significa que ya se venció el refresh tambien y procede a mostrar el porque y cierra sesión automaticamente
+    refresh(peticion:any){
+      API.sesion('refresh',config2)
+    .then(response => {
+      const parsedJSON = response;
+      var login: Login[] = parsedJSON as Login[];
+      //console.log('MESSAGE: ' +login.message);
+      //console.log('STATUS: ' +login.status);
+      //console.log('TOKEN: ' +login.resp);
+      if (String(login.status)=='200'){
+        token=login.resp.token
+        refresh=login.resp.refresh
+        console.log('en el refresh')
+        this.refreshCorrecto(peticion)
+      }else if (String(login.status)=='400'){
+        this.mensajeShow(login.message,login.status)
+      }
+    })
+    .catch(error => this.mensajeShow(error.response.message,error.response.status))
+    }
+    //actualiza los tokens en el local storage y despues en el mismo componente
+    refreshCorrecto(peticion:any){
+      LOCALSTORAGE.setToken(token)
+      LOCALSTORAGE.setRefresh(refresh)
+      console.log(peticion+'refreshCorrecto')
+      if(peticion==1){
+        //carga el estado para despues hacer la peticion del insert
+        this.upDateToken().then(res => this.peticion());
+      } else if (peticion==2){
+        //carga el estado para despues hacer la peticion de los grupos
+        this.upDateToken().then(res => this.getGrupoUsuario());
+      }
+    }
+    //actualiza y refleja el valor de datetime fechaCreación
+    setDateCreacion(newDate:any) {
+        this.setState({ creacionDate: newDate });
+    }
+    //actualiza y refleja el valor de datetime fechaExpiración
+    setDateExpiracion(newDate:any) {
+      this.setState({ expiracionDate: newDate });
+    }
+    //actualiza y refleja el valor de combobox Aviso
+    comboAviso(selected:string){
+      this.setState({selectedAviso: selected})
+    }
+    //actualiza y refleja el valor de combobox grupo
+    comboGrupo(selected:string){
+      this.setState({selectedGrupo: selected})
+    }
+    //actualiza y refleja el valor de combobox tipo
+    comboTipo(selected:string){
+      this.setState({selectedTipo: selected})
+    }
+    //muestra mensajes/alertas dependiendo de status ya sea de peticion o de validacion
+    mensajeShow = (mensaje:any,status:any,peticion?:any)=>{
+      if (status==1){
+        Alert.alert(
+          "Error de validación",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => ""},
+          ],
+          {cancelable: false},
+        );
+      } else if (status==200){
+        Alert.alert(
+          "Tarea agregada exitosamente",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => this.limpiar()},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==300){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==400){
+        Alert.alert(
+          "Error",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () =>this.salir()},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==401){
+        //Alert.alert(
+          //"Error",
+          //mensaje,
+          //[
+            //{text: 'OK', 
+            //onPress: () =>  this.refresh()},
+          //],
+          //{cancelable: false},
+        //);
+        console.log('entro en 401')
+        if (peticion==1){
+          this.refresh(1)
+        }else if (peticion==2){
+          this.refresh(2)
+        }
+      }else if(status==500){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }
+    }
+    //se vencio la sesión por lo tanto se redirigera a iniciar sesión
+    salir=()=>{
+      LOCALSTORAGE.borrarSesion()
+      this.props.navigation.navigate("Login")
+    }
+    //limpiar variable cuando ya se agrego correctamente
+    limpiar=()=>{
+      this.setState({
+        asunto:'',
+        contenido:''
+      })
+    }
+    //realiza la petición para hacer el insert de la tarea
+    peticion=()=>{
+      console.log('entro en peticion')
+      let data:any={
+        "asunto": this.state.asunto,
+        "contenido": this.state.contenido,
+        "descartada": 0,
+        "fechaCreacion": this.state.creacionDate,
+        "fechaExpiracion": this.state.expiracionDate,
+        "fechaRecordatorio": '2019-06-28',
+        "leido":0,
+        "tipo": this.state.selectedTipo,
+        "creador":{
+          "id": this.state.id
+        },
+        "destinatario": {
+          "id":1
+        },
+      }
+      API.insert('SysTareaRest',data,config)
+      .then(response => {
+      const parsedJSON = response;
+      var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+      console.log(baseResponse.status);
+      this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
+      })
+      .catch(error => this.mensajeShow(error.message,error.status,1))
+    }
+    getGrupoUsuario(){
+      config3 = {
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD,'id':this.state.id}
+      }
+      console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
+      API.getAllGrupo('UsuarioRest/getById',config3)
+      .then(response => {
+        const parsedJSON = response;
+        //var sysGrupo: SysGrupo[] = parsedJSON as SysGrupo[];
+        //console.log('MESSAGE: ' +baseResponse.message);
+       // console.log('STATUS: ' +baseResponse.status);
+       // console.log('Resp: ' +baseResponse.resp);
+       //console.log(parsedJSON)
+        //this.mensajeShow(baseResponse.message,baseResponse.status)
+        //this.mensajeShow(login.message,login.status)
+      })
+      .catch(error =>this.mensajeShow(error.message,error.status,2))
+    }
+
 }
 const styles = StyleSheet.create({
   button:{
