@@ -10,12 +10,15 @@ import DeviceInfo from 'react-native-device-info';
 import { BaseResponse } from '../entidades/BaseResponse';
 import { Login } from '../entidades/login';
 import { SysGrupo } from '../entidades/SysGrupo';
+import { Time } from 'react-native-gifted-chat';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
 interface state{
     creacionDate?: string;
+    creacionTime?: string;
     expiracionDate?: string;
+    expiracionTime?:string;
     selectedAviso?:string;
     selectedGrupo?:string;
     selectedTipo?:string;
@@ -28,6 +31,7 @@ interface state{
     macADD?:String;
     id?:String;
     usuario?:String;
+    grupos:any;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -36,10 +40,20 @@ let config2={}
 let config3={}
 let token=""
 let refresh=""
+let groups:any
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = {usuario:'', id:'',asunto:'',contenido:'',expiracionDate:'2019-06-20',creacionDate: "2019-06-20",selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+      //sacamos la fecha y hora actual para mostrar en el comoponente
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
+      var time= today.getHours()+':'+today.getMinutes()+':'+today.getSeconds();
+      console.log(time)
+      let date:string;
+      date = yyyy + '-' + mm + '-' + dd;
+      this.state = {grupos:[{"key":"1","value":"grupo 1"},{"key":"2","value":"grupo 2"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:'12:00',creacionTime:time,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       DeviceInfo.getMACAddress().then(mac => {
@@ -129,11 +143,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         }}>
                         <Text style={{fontWeight: 'bold',textAlign:'center',alignItems:'center'}}>Fecha</Text>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
-                          <Text style={{marginRight:5,marginTop:10,marginBottom:10}}>Creación:</Text>
+                          <Text style={{marginRight:5,marginTop:10,marginBottom:10}}>   Creación:</Text>
                           <DatePicker
-                            style={{width: 160,marginLeft:13,marginRight:15,marginTop:5,marginBottom:5}}
+                            style={{width: 140,marginLeft:2,marginRight:15,marginTop:5,marginBottom:5}}
                             date={this.state.creacionDate}
                             mode="date"
+                            disabled={true}
                             format="YYYY-MM-DD"
                             confirmBtnText="Ok"
                             cancelBtnText="Cancelar"
@@ -149,13 +164,31 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 }
                             }}
                             minuteInterval={10}
-                            onDateChange={(datetime:any) => {this.setState({creacionDate: datetime});}}
+                            onDateChange={(datetime:any) => {this.setState({creacionDate: datetime});console.log(datetime)}}
+                            />
+                            <DatePicker
+                            style={{width: 80, marginLeft:2,marginRight:15,marginTop:5,marginBottom:5}}
+                            date={this.state.creacionTime}
+                            mode="time"
+                            disabled={true}
+                            format="HH:mm:ss"
+                            is24Hour={true}
+                            confirmBtnText="Ok"
+                            cancelBtnText="Cancelar"
+                            showIcon={false}
+                            customStyles={{
+                                dateInput: {
+                                marginLeft: 0
+                                }
+                            }}
+                            minuteInterval={10}
+                            onDateChange={(datetime:any) => {this.setState({creacionTime: datetime});console.log(datetime)}}
                             />
                         </View>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
                           <Text style={{marginRight:5,marginTop:10,marginBottom:10}} >Expiración:</Text>
                           <DatePicker
-                            style={{width: 160, marginLeft:2,marginRight:15}}
+                            style={{width: 140, marginLeft:2,marginRight:15}}
                             date={this.state.expiracionDate}
                             mode="date"
                             format="YYYY-MM-DD"
@@ -173,7 +206,24 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 }
                             }}
                             minuteInterval={10}
-                            onDateChange={(date:any) => {this.setState({expiracionDate: date});}}
+                            onDateChange={(date:any) => {this.setState({expiracionDate: date});console.log(date)}}
+                            />
+                             <DatePicker
+                            style={{width: 80, marginLeft:2,marginRight:15}}
+                            date={this.state.expiracionTime}
+                            mode="time"
+                            format="HH:mm"
+                            is24Hour={true}
+                            confirmBtnText="Ok"
+                            cancelBtnText="Cancelar"
+                            showIcon={false}
+                            customStyles={{
+                                dateInput: {
+                                marginLeft: 0
+                                }
+                            }}
+                            minuteInterval={10}
+                            onDateChange={(datetime:any) => {this.setState({expiracionTime: datetime});console.log(datetime)}}
                             />
                         </View>
                         <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
@@ -231,7 +281,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                             checked={this.state.checked}
                             onPress={() => this.setState({checked: !this.state.checked,enabled: !this.state.enabled})}
                           />
-                          <View style={{width:140}}>
+                          <View style={{width:200}}>
                               <Item picker>
                                 <Picker
                                   mode="dropdown"
@@ -242,10 +292,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                   placeholderIconColor="#007aff"
                                   selectedValue={this.state.selectedGrupo}
                                   onValueChange={this.comboGrupo.bind(this)}
-                                  enabled={this.state.enabled}
-                                >
-                                  <Picker.Item label="Grupo 1" value="key0" />
-                                  <Picker.Item label="Grupo 2" value="key1" />
+                                  enabled={this.state.enabled}>
+                                  {
+                                    this.state.grupos.map( (v:any)=>{
+                                      return <Picker.Item label={v.value} value={v.key} />
+                                    })
+                                  }
                                 </Picker>
                               </Item>
                           </View>
@@ -460,13 +512,19 @@ class CrearTareaScreen extends React.Component<Props,state> {
     }
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
+      let destinatario;
+      if (this.state.checked==true){
+        destinatario=this.state.selectedGrupo
+      }else{
+        destinatario='null'
+      }
       console.log('entro en peticion')
       let data:any={
         "asunto": this.state.asunto,
         "contenido": this.state.contenido,
         "descartada": 0,
-        "fechaCreacion": this.state.creacionDate,
-        "fechaExpiracion": this.state.expiracionDate,
+        "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
+        "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
         "fechaRecordatorio": '2019-06-28',
         "leido":0,
         "tipo": this.state.selectedTipo,
@@ -474,7 +532,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
           "id": this.state.id
         },
         "destinatario": {
-          "id":1
+          "id":destinatario
         },
       }
       API.insert('SysTareaRest',data,config)
@@ -493,12 +551,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
       console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
       API.getAllGrupo('UsuarioRest/getById',config3)
       .then(response => {
-        const parsedJSON = response;
+        groups= response;
         //var sysGrupo: SysGrupo[] = parsedJSON as SysGrupo[];
-        //console.log('MESSAGE: ' +baseResponse.message);
+        //grupos=response
+        console.log('response: ' +response);
        // console.log('STATUS: ' +baseResponse.status);
        // console.log('Resp: ' +baseResponse.resp);
-       //console.log(parsedJSON)
+       console.log(groups)
+       this.setState({grupos:groups})
         //this.mensajeShow(baseResponse.message,baseResponse.status)
         //this.mensajeShow(login.message,login.status)
       })
