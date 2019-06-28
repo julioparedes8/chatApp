@@ -49,11 +49,19 @@ class CrearTareaScreen extends React.Component<Props,state> {
       var dd = String(today.getDate()).padStart(2, '0');
       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
       var yyyy = today.getFullYear();
-      var time= today.getHours()+':'+today.getMinutes()+':'+today.getSeconds();
-      console.log(time)
+      var hora= today.getHours()
+      var min = today.getMinutes()
+      var seg=today.getSeconds()
+      //console.log(pedo+' '+'timestamp= '+this.toTimestamp('2019/06/28 12:00'))
+      var horaBuena=this.agregarZero(hora)
+      var minBuena=this.agregarZero(min)
+      var segBuena=this.agregarZero(seg)
+      var times= horaBuena+':'+minBuena+':'+segBuena
+      var expTime=horaBuena+':'+minBuena
+      console.log('times: '+times)
       let date:string;
       date = yyyy + '-' + mm + '-' + dd;
-      this.state = {grupos:[{"key":"1","value":"grupo 1"},{"key":"2","value":"grupo 2"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:'12:00',creacionTime:time,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+      this.state = {grupos:[{"key":"1","value":"seleccionar"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:expTime,creacionTime:times,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       DeviceInfo.getMACAddress().then(mac => {
@@ -63,7 +71,17 @@ class CrearTareaScreen extends React.Component<Props,state> {
       //this.upDateToken()
     }
     //obtiene mac
-    //actualiza el token,refresh,id,usuario obteniendolo del local storage 
+    //actualiza el token,refresh,id,usuario obteniendolo del local storage
+    agregarZero(numero:any){
+      if(numero<10){
+        var horaBuena= "0"+numero
+        return horaBuena
+        //console.log(horaBuena)
+      }else {
+        var horaBuena:string=numero.toString()
+        return horaBuena
+      }
+    } 
     upDateToken(){
       return new Promise((resolve, reject) => {
         LOCALSTORAGE.getToken().then(response=>{
@@ -242,12 +260,12 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 >
                                   <Picker.Item label="Al Momento" value="Al Momento" />
                                   <Picker.Item label="Ninguno" value="Ninguno" />
-                                  <Picker.Item label="1 minuto" value="1 minuto" />
-                                  <Picker.Item label="5 minutos" value="5 minutos" />
-                                  <Picker.Item label="15 minutos" value="15 minutos" />
-                                  <Picker.Item label="30 minutos" value="30 minutos" />
-                                  <Picker.Item label="1 hora" value="1 hora" />
-                                  <Picker.Item label="2 horas" value="2 horas" />
+                                  <Picker.Item label="1 minuto" value="1" />
+                                  <Picker.Item label="5 minutos" value="5" />
+                                  <Picker.Item label="15 minutos" value="15" />
+                                  <Picker.Item label="30 minutos" value="30" />
+                                  <Picker.Item label="1 hora" value="60" />
+                                  <Picker.Item label="2 horas" value="120" />
                                 </Picker>
                             </Item>
                           </View>
@@ -375,7 +393,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
             this.peticion()
           }
     }
-        //peticion para hacer el refresh por que se vencio el token
+    //peticion para hacer el refresh por que se vencio el token
     //si el status es 200 entonces llama otra funcion  para actualizar los tokens
     //si es 400 significa que ya se venció el refresh tambien y procede a mostrar el porque y cierra sesión automaticamente
     refresh(peticion:any){
@@ -512,36 +530,105 @@ class CrearTareaScreen extends React.Component<Props,state> {
     }
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
+      //sacar la fecha de recordatorio
+      let fecha = new Date(this.state.expiracionDate+' '+this.state.expiracionTime).getTime() / 1000
+      console.log('timestamp'+fecha)
+      let fechaRecordatorio:any
+      let fechaStamp:any
+      //Si el aviso es al momento se agrega la misma fecha de expiracion
+      //si no hay aviso no se agrega nada
+      //si seleciona un dato, se le resta la cantidad a la fecha de expiracion
+      if(this.state.selectedAviso=='Al Momento'){
+        fechaRecordatorio=this.state.expiracionDate+'T'+this.state.expiracionTime
+        console.log('entro en recordatorio')
+      }else if(this.state.selectedAviso=='Ninguno'){
+        console.log('entro en ninguno')
+        fechaRecordatorio=''
+      }else {
+          //seleciona la cantidad para el aviso antes del tiempo de expiracion
+          //se calcula el timestamp de la diferencia entre las fechas
+          if (this.state.selectedAviso=='1'){
+            let stamp= fecha- (1*60)
+            //console.log(stamp)
+            fechaStamp = new Date(stamp*1000);
+          }
+          else if (this.state.selectedAviso=='5'){
+            let stamp= fecha- (5*60)
+            fechaStamp = new Date(stamp*1000);
+          }
+          else if (this.state.selectedAviso=='15'){
+            let stamp= fecha- (15*60)
+            fechaStamp = new Date(stamp*1000);
+          }
+          else if (this.state.selectedAviso=='30'){
+            let stamp= fecha- (30*60)
+            fechaStamp = new Date(stamp*1000);
+          }
+          else if (this.state.selectedAviso=='60'){
+            let stamp= fecha- (60*60)
+            fechaStamp = new Date(stamp*1000);
+          }
+          else if (this.state.selectedAviso=='120'){
+            let stamp= fecha- (120*60)
+            fechaStamp = new Date(stamp*1000);
+          }
+          //saca por partes la fecha de recordatorio para que tenga el formato adecuado
+          var dd = String(fechaStamp.getDate()).padStart(2, '0');
+          var mm = String(fechaStamp.getMonth() + 1).padStart(2, '0'); //January is 0!
+          var yyyy = fechaStamp.getFullYear();
+          var hora= fechaStamp.getHours()
+          var min = fechaStamp.getMinutes()
+          var seg=fechaStamp.getSeconds()
+          //console.log(pedo+' '+'timestamp= '+this.toTimestamp('2019/06/28 12:00'))
+          var horaBuena=this.agregarZero(hora)
+          var minBuena=this.agregarZero(min)
+          var segBuena=this.agregarZero(seg)
+          fechaRecordatorio= yyyy+'-'+mm+'-'+ dd+'T'+horaBuena+':'+minBuena+':'+segBuena
+          console.log(fechaRecordatorio)
+          //console.log(fechaStamp.getHours())
+      }
       let destinatario;
       if (this.state.checked==true){
         destinatario=this.state.selectedGrupo
+        console.log('destinatario '+destinatario)
+        var data:any={
+          "asunto": this.state.asunto,
+          "contenido": this.state.contenido,
+          "descartada": 0,
+          "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
+          "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
+          "fechaRecordatorio": fechaRecordatorio,
+          "leido":0,
+          "tipo": this.state.selectedTipo,
+          "creador":{
+            "id": this.state.id
+          },
+          //"destinatario": {
+            //"id":destinatario
+          //},
+        }
       }else{
-        destinatario='null'
-      }
-      console.log('entro en peticion')
-      let data:any={
-        "asunto": this.state.asunto,
-        "contenido": this.state.contenido,
-        "descartada": 0,
-        "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
-        "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
-        "fechaRecordatorio": '2019-06-28',
-        "leido":0,
-        "tipo": this.state.selectedTipo,
-        "creador":{
-          "id": this.state.id
-        },
-        "destinatario": {
-          "id":destinatario
-        },
+        var data:any={
+          "asunto": this.state.asunto,
+          "contenido": this.state.contenido,
+          "descartada": 0,
+          "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
+          "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
+          "fechaRecordatorio": fechaRecordatorio,
+          "leido":0,
+          "tipo": this.state.selectedTipo,
+          "creador":{
+            "id": this.state.id
+          }
+        }
       }
       API.insert('SysTareaRest',data,config)
-      .then(response => {
-      const parsedJSON = response;
-      var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
-      console.log(baseResponse.status);
-      this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
-      })
+        .then(response => {
+        const parsedJSON = response;
+        var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+        console.log(baseResponse.status);
+        this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
+        })
       .catch(error => this.mensajeShow(error.message,error.status,1))
     }
     getGrupoUsuario(){

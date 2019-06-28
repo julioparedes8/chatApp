@@ -80,7 +80,11 @@ class AgendaScreen extends React.Component<Props,State> {
       return date.toISOString().split('T')[0];
     }
     selected(){
-      const strTime = new Date().toDateString();
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
+      const strTime = yyyy+'-'+mm+'-'+dd;
       return  strTime
     }
     render(){
