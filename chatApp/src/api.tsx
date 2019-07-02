@@ -84,16 +84,8 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                let groups=[]
-                let us: String[]
-                us=response.data.resp.listGrupoUsuario
-                let count=us.length
-                //console.log(count)
-                //console.log(response.data.resp.listGrupoUsuario[2].sysGrupo.nombre)
-                for(var i=0;i<count;i++){
-                    groups.push({"key":response.data.resp.listGrupoUsuario[i].sysGrupo.id,"value":response.data.resp.listGrupoUsuario[i].sysGrupo.nombre})
-                }
-                resolve(groups)
+                console.log(response.data.resp)
+                resolve()
             })
             .catch(function (error) {
                 //console.log(error.response
@@ -122,7 +114,7 @@ class Api{
         })
     }
     //inserta en una tabla, recibe el nombre de la api,body y los headers
-    async insert(tablaRest : string,data:any,headers:any){
+    async post(tablaRest : string,data:any,headers:any){
         return new Promise(function(resolve, reject) {
             axios.post(url.concat( tablaRest ),data ,headers)
             .then(function (response) {
@@ -253,6 +245,50 @@ class Api{
                 }
             });
         })
+    }
+    //es un get con post en una tabla, recibe el nombre de la api,body y los headers
+    async postGet(tablaRest : string,data:any,headers:any){
+            return new Promise(function(resolve, reject) {
+                axios.post(url.concat( tablaRest ),data ,headers)
+                .then(function (response) {
+                    //console.log(response.data.resp.length)
+                    //console.log(response.data.resp[0].sysGrupo.nombre)
+                    let groups=[]
+                    //let us: String[]
+                    //us=response.data.resp.listGrupoUsuario
+                    let count=response.data.resp.length
+                    //console.log(count)
+                    //console.log(response.data.resp.listGrupoUsuario[2].sysGrupo.nombre)
+                    for(var i=0;i<count;i++){
+                        groups.push({"key":response.data.resp[i].sysGrupo.id,"value":response.data.resp[i].sysGrupo.nombre})
+                    }
+                    resolve(response)
+                })
+                .catch(function (error) {
+                    //console.log(error.response
+                    //return error;
+                    if(error.response.status=='400'){
+                        console.log(error.response)
+                        let err={
+                            message:'Petición Incorrecta',
+                            status:'400'
+                        }
+                        reject(err)
+                    }else if(error.response.status=='500'){
+                        let err={
+                            message:'Error interno del servidor',
+                            status:'500'
+                        }
+                        reject(err)
+                    }else if (error.response.status=='401'){
+                        let err={
+                            message:'Fallo autenticación',
+                            status:'401'
+                        }
+                        reject(err)
+                    }
+                });
+            })
     }
 }
 export default Api;

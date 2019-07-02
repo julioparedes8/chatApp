@@ -8,9 +8,10 @@ import { CheckBox } from 'react-native-elements'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import DeviceInfo from 'react-native-device-info';
 import { BaseResponse } from '../entidades/BaseResponse';
+import { Tarea } from '../entidades/Tarea';
 import { Login } from '../entidades/login';
-import { SysGrupo } from '../entidades/SysGrupo';
 import { Time } from 'react-native-gifted-chat';
+import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -622,32 +623,33 @@ class CrearTareaScreen extends React.Component<Props,state> {
           }
         }
       }
-      API.insert('SysTareaRest',data,config)
+      API.post('SysTareaRest',data,config)
         .then(response => {
         const parsedJSON = response;
-        var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+        var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
         console.log(baseResponse.status);
+        console.log(baseResponse.resp.contenido);
         this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
         })
       .catch(error => this.mensajeShow(error.message,error.status,1))
     }
     getGrupoUsuario(){
       config3 = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD,'id':this.state.id}
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD}
       }
       console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
-      API.getAllGrupo('UsuarioRest/getById',config3)
+      API.post('SysGrupoUsuarioRest/getByUsuarioId',this.state.id,config3)
       .then(response => {
-        groups= response;
-        //var sysGrupo: SysGrupo[] = parsedJSON as SysGrupo[];
-        //grupos=response
-        console.log('response: ' +response);
-       // console.log('STATUS: ' +baseResponse.status);
-       // console.log('Resp: ' +baseResponse.resp);
-       console.log(groups)
-       this.setState({grupos:groups})
-        //this.mensajeShow(baseResponse.message,baseResponse.status)
-        //this.mensajeShow(login.message,login.status)
+        const parsedJSON = response;
+        var baseResponse: BaseResponse<SysGrupoUsuario>[] = parsedJSON as BaseResponse<SysGrupoUsuario>[];
+        console.log(baseResponse.message);
+        console.log(baseResponse.status);
+        console.log(baseResponse.resp[0].sysGrupo.nombre);
+        let groups=[]
+        for(var i=0;i<baseResponse.resp.length;i++){
+          groups.push({"key":baseResponse.resp[i].sysGrupo.id,"value":baseResponse.resp[i].sysGrupo.nombre})
+        }
+        this.setState({grupos:groups})
       })
       .catch(error =>this.mensajeShow(error.message,error.status,2))
     }
