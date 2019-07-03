@@ -12,6 +12,7 @@ import { Tarea } from '../entidades/Tarea';
 import { Login } from '../entidades/login';
 import { Time } from 'react-native-gifted-chat';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
+import SysGrupo from '../entidades/SysGrupo';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -33,6 +34,7 @@ interface state{
     id?:String;
     usuario?:String;
     grupos:any;
+    usuarios:any
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -41,6 +43,7 @@ let config2={}
 let config3={}
 let token=""
 let refresh=""
+let fechaRecordatorio:any
 let groups:any
 class CrearTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
@@ -62,7 +65,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
       console.log('times: '+times)
       let date:string;
       date = yyyy + '-' + mm + '-' + dd;
-      this.state = {grupos:[{"key":"1","value":"seleccionar"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:expTime,creacionTime:times,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+      this.state = {usuarios:[],grupos:[{"key":"1","value":"seleccionar"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:expTime,creacionTime:times,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       DeviceInfo.getMACAddress().then(mac => {
@@ -427,6 +430,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
       } else if (peticion==2){
         //carga el estado para despues hacer la peticion de los grupos
         this.upDateToken().then(res => this.getGrupoUsuario());
+      } else if (peticion==3){
+        this.upDateToken().then(res=>this.getUsuarioXGrupo());
       }
     }
     //actualiza y refleja el valor de datetime fechaCreación
@@ -505,6 +510,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
           this.refresh(1)
         }else if (peticion==2){
           this.refresh(2)
+        }else if(peticion==3){
+          this.refresh(3)
         }
       }else if(status==500){
         Alert.alert(
@@ -534,7 +541,6 @@ class CrearTareaScreen extends React.Component<Props,state> {
       //sacar la fecha de recordatorio
       let fecha = new Date(this.state.expiracionDate+' '+this.state.expiracionTime).getTime() / 1000
       console.log('timestamp'+fecha)
-      let fechaRecordatorio:any
       let fechaStamp:any
       //Si el aviso es al momento se agrega la misma fecha de expiracion
       //si no hay aviso no se agrega nada
@@ -588,26 +594,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
           console.log(fechaRecordatorio)
           //console.log(fechaStamp.getHours())
       }
-      let destinatario;
       if (this.state.checked==true){
-        destinatario=this.state.selectedGrupo
-        console.log('destinatario '+destinatario)
-        var data:any={
-          "asunto": this.state.asunto,
-          "contenido": this.state.contenido,
-          "descartada": 0,
-          "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
-          "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
-          "fechaRecordatorio": fechaRecordatorio,
-          "leido":0,
-          "tipo": this.state.selectedTipo,
-          "creador":{
-            "id": this.state.id
-          },
-          //"destinatario": {
-            //"id":destinatario
-          //},
-        }
+        this.getUsuarioXGrupo().then(res => this.insertTarea(this.state.usuarios.length));
       }else{
         var data:any={
           "asunto": this.state.asunto,
@@ -622,8 +610,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
             "id": this.state.id
           }
         }
-      }
-      API.post('SysTareaRest',data,config)
+        API.post('SysTareaRest',data,config)
         .then(response => {
         const parsedJSON = response;
         var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
@@ -632,6 +619,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
         this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
         })
       .catch(error => this.mensajeShow(error.message,error.status,1))
+      }
     }
     getGrupoUsuario(){
       config3 = {
@@ -642,9 +630,10 @@ class CrearTareaScreen extends React.Component<Props,state> {
       .then(response => {
         const parsedJSON = response;
         var baseResponse: BaseResponse<SysGrupoUsuario>[] = parsedJSON as BaseResponse<SysGrupoUsuario>[];
-        console.log(baseResponse.message);
-        console.log(baseResponse.status);
-        console.log(baseResponse.resp[0].sysGrupo.nombre);
+        //console.log(baseResponse.message);
+        //console.log(baseResponse.status);
+        //console.log(baseResponse.usoEnTimbrado);
+        //console.log(baseResponse.resp[0].sysGrupo.nombre);
         let groups=[]
         for(var i=0;i<baseResponse.resp.length;i++){
           groups.push({"key":baseResponse.resp[i].sysGrupo.id,"value":baseResponse.resp[i].sysGrupo.nombre})
@@ -653,7 +642,66 @@ class CrearTareaScreen extends React.Component<Props,state> {
       })
       .catch(error =>this.mensajeShow(error.message,error.status,2))
     }
-
+    getUsuarioXGrupo(){
+      return new Promise((resolve, reject) => {
+        config3 = {
+          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD,'id':this.state.selectedGrupo}
+        }
+        console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.selectedGrupo)
+        API.getAll('SysGrupoRest/getById',config3)
+        .then(response => {
+          const parsedJSON=response
+          var baseResponse: BaseResponse<SysGrupo>[] = parsedJSON as BaseResponse<SysGrupo>[];
+          console.log(baseResponse.message);
+          console.log(baseResponse.status);
+          console.log(baseResponse.resp.nombre);
+          console.log(baseResponse.resp.listGrupoUsuario.length);
+          let users=[]
+          for(var i=0;i<baseResponse.resp.listGrupoUsuario.length;i++){
+            console.log(baseResponse.resp.listGrupoUsuario[i].usuario.id);
+            users.push({"id":baseResponse.resp.listGrupoUsuario[i].usuario.id})
+          }
+          console.log(users);
+          this.setState({usuarios:users})
+          resolve()
+          //this.upDateToken().then(res =>this.insertTarea(this.state.usuarios.length));
+        })
+        .catch(error =>this.mensajeShow(error.message,error.status,3))
+      });
+    }
+    insertTarea(numero:any){
+      for(var i=0;i<numero;i++){
+        console.log('valor de i: '+i);
+        let destinatario=this.state.usuarios[i].id
+        var data:any={
+          "asunto": this.state.asunto,
+          "contenido": this.state.contenido,
+          "descartada": 0,
+          "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
+          "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
+          "fechaRecordatorio": fechaRecordatorio,
+          "leido":0,
+          "tipo": this.state.selectedTipo,
+          "creador":{
+            "id": this.state.id
+          },
+          "destinatario":{
+            "id":destinatario
+          }
+        }
+        this.insertarBueno(data,config,i)
+      }
+    }
+    insertarBueno(data:any,config:any,valor:number){
+      API.post('SysTareaRest',data,config)
+          .then(response => {
+            const parsedJSON = response;
+            var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
+            console.log(baseResponse.status);
+            console.log('valor de i: '+valor);
+          })
+        .catch(error => this.mensajeShow(error.message,error.status,1))
+    }
 }
 const styles = StyleSheet.create({
   button:{

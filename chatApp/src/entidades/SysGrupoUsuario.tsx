@@ -1,7 +1,8 @@
 import SysGrupo from './Sysgrupo'
+import Usuario from './Usuario'
 export default interface SysGrupoUsuario{
    id:Number;
-   usuario:[];
+   usuario:Usuario;
    isAdmin:Boolean;
    sysGrupo:SysGrupo; 
 }

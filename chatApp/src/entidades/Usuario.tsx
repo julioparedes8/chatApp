@@ -1,8 +1,37 @@
 //interfaz del Usuario
-export interface Usuario{
-    message:String;
-    status:Number;
-    resp:{
-        id: String;
-    };
+export default interface Usuario{
+    id: Number,
+    codigo: String,
+    nombre: String,
+    password: String,
+    email?: String,
+    puesto?: String,
+    nivelAccesoSistema: Number,
+    restringeIP?: String,
+    restringeMAC?: String,
+    timeOut: Number,
+    nSesiones: Number,
+    perfiles: String,
+    perfilSeguridad: Number,
+    fechaExpiracion: String,
+    activaFechaEx: Number,
+    restringeDominio: Number,
+    restringeSubRed: Number,
+    idioma: String,
+    tokens: [],
+    lstUsuarioParams: [],
+    configuracionEstilo: {
+        id: Number,
+        usarEmpresa: Boolean,
+        fuente: String,
+        tamano: Number,
+        colorPrimario: String,
+        colorSecundario: String
+    },
+    fechaCreacion: String,
+    fechaModificacion: String,
+    departamento: String,
+    ultimaConexion: String,
+    activado: Boolean,
+    imagen: String
 }

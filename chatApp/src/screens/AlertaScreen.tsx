@@ -58,11 +58,11 @@ class AlertaScreen extends React.Component<Props,State> {
       API.getAll('SysTareaRest',config)
       .then(response => {
         const parsedJSON = response;
-        var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+        //var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
         //console.log('MESSAGE: ' +baseResponse.message);
        // console.log('STATUS: ' +baseResponse.status);
        // console.log('Resp: ' +baseResponse.resp);
-        this.mensajeShow(baseResponse.message,baseResponse.status)
+       // this.mensajeShow(baseResponse.message,baseResponse.status)
         //this.mensajeShow(login.message,login.status)
       })
       .catch(error =>this.mensajeShow(error.message,error.status))

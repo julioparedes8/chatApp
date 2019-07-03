@@ -3,4 +3,5 @@ export interface BaseResponse<T>{
     message:String;
     status:Number;
     resp: T;
+    usoEnTimbrado:Boolean;
 }

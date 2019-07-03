@@ -1,11 +1,10 @@
 import axios from 'axios';
+import { JsogService } from 'jsog-typescript'
+import { JsogObject } from 'jsog-typescript/dist/model/JsogObject';
 //url del servidor
 let url='http://10.10.1.81:8008/'
+const jsog = new JsogService();
 //json de la configuracion para pasar parametros a la api axios
-interface Grupo {
-    id: number,
-    nombre: string
-};
 class Api{
     //consulta por id, recibe el nombre de la api y el id
     async getById(tablaRest : string,id:number,headers:any){
@@ -50,8 +49,12 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.get(url.concat( tablaRest ) ,headers)
             .then(function (response) {
-                //console.log(response.data)
-                resolve(response.data)
+                let parsedJSON:JsogObject[]
+                parsedJSON=response.data
+                let data=jsog.deserializeArray(parsedJSON);
+                console.log(data)
+                console.log(response.data)
+                resolve(data)
             })
             .catch(function (error) {
                 //console.log(error.response
@@ -118,8 +121,12 @@ class Api{
         return new Promise(function(resolve, reject) {
             axios.post(url.concat( tablaRest ),data ,headers)
             .then(function (response) {
+                let parsedJSON:JsogObject[]
+                parsedJSON=response.data
+                let data=jsog.deserializeArray(parsedJSON);
+                console.log(data)
                 console.log(response.data)
-                resolve(response.data)
+                resolve(data)
             })
             .catch(function (error) {
                 //console.log(error.response
