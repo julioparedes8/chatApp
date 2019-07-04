@@ -533,8 +533,11 @@ class CrearTareaScreen extends React.Component<Props,state> {
     limpiar=()=>{
       this.setState({
         asunto:'',
-        contenido:''
+        contenido:'',
+        checked:false,
+        enabled:false
       })
+      this.props.navigation.navigate("Home")
     }
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
@@ -699,6 +702,9 @@ class CrearTareaScreen extends React.Component<Props,state> {
             var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
             console.log(baseResponse.status);
             console.log('valor de i: '+valor);
+            if((valor+1)==this.state.usuarios.length){
+              this.mensajeShow("Asunto: "+baseResponse.resp.asunto+"\nContenido: "+baseResponse.resp.contenido + "\nFecha Expiración: "+baseResponse.resp.fechaExpiracion,baseResponse.status)
+            }
           })
         .catch(error => this.mensajeShow(error.message,error.status,1))
     }
