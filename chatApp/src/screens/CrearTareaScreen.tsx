@@ -598,30 +598,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
           //console.log(fechaStamp.getHours())
       }
       if (this.state.checked==true){
+        this.setState({usuarios:[]})
         this.getUsuarioXGrupo().then(res => this.insertTarea(this.state.usuarios.length));
       }else{
-        var data:any={
-          "asunto": this.state.asunto,
-          "contenido": this.state.contenido,
-          "descartada": 0,
-          "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
-          "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
-          "fechaRecordatorio": fechaRecordatorio,
-          "leido":0,
-          "tipo": this.state.selectedTipo,
-          "creador":{
-            "id": this.state.id
-          }
-        }
-        API.post('SysTareaRest',data,config)
-        .then(response => {
-        const parsedJSON = response;
-        var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
-        console.log(baseResponse.status);
-        console.log(baseResponse.resp.contenido);
-        this.mensajeShow("Asunto: "+this.state.asunto+"\nContenido: "+this.state.contenido + "\nFecha Expiración: "+this.state.expiracionDate,baseResponse.status)
-        })
-      .catch(error => this.mensajeShow(error.message,error.status,1))
+        this.setState({usuarios:[]})
+        this.state.usuarios.push({"id":this.state.id})
+        console.log(this.state.usuarios)
+        console.log(this.state.usuarios.length)
+        this.insertTarea(this.state.usuarios.length)
       }
     }
     getGrupoUsuario(){
@@ -674,7 +658,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
     }
     insertTarea(numero:any){
       for(var i=0;i<numero;i++){
-        console.log('valor de i: '+i);
+        console.log('valor de numero: '+numero);
         let destinatario=this.state.usuarios[i].id
         var data:any={
           "asunto": this.state.asunto,
@@ -692,18 +676,19 @@ class CrearTareaScreen extends React.Component<Props,state> {
             "id":destinatario
           }
         }
-        this.insertarBueno(data,config,i)
+        this.insertarBueno(data,config,i,numero)
       }
     }
-    insertarBueno(data:any,config:any,valor:number){
+    insertarBueno(data:any,config:any,valor:number,numUser:number){
       API.post('SysTareaRest',data,config)
           .then(response => {
             const parsedJSON = response;
             var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
             console.log(baseResponse.status);
             console.log('valor de i: '+valor);
-            if((valor+1)==this.state.usuarios.length){
-              this.mensajeShow("Asunto: "+baseResponse.resp.asunto+"\nContenido: "+baseResponse.resp.contenido + "\nFecha Expiración: "+baseResponse.resp.fechaExpiracion,baseResponse.status)
+            console.log('usuarios: '+this.state.usuarios.length);
+            if((valor+1)==numUser){
+              this.mensajeShow("Asunto: "+baseResponse.resp.asunto+"\nContenido: "+baseResponse.resp.contenido,baseResponse.status)
             }
           })
         .catch(error => this.mensajeShow(error.message,error.status,1))

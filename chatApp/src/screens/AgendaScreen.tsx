@@ -63,7 +63,7 @@ class AgendaScreen extends React.Component<Props,State> {
     //actualiza variables cuando se monta el componentev
     componentDidMount(){
       //carga el estado para despues hacer la peticion de los grupos
-      this.upDateToken().then(res => this.peticion());
+      //this.upDateToken().then(res => this.peticion());
       //this.getGrupoUsuario()
     }
     upDateToken(){
@@ -204,6 +204,7 @@ class AgendaScreen extends React.Component<Props,State> {
     }
     loadItems(day: { timestamp: number; }) {
       this.setState({selectedDate: day});
+      this.upDateToken().then(res => this.peticion());
       este.push(
         {
           name: 'primero',
@@ -246,7 +247,7 @@ class AgendaScreen extends React.Component<Props,State> {
         this.setState({
           items: newItems
         });
-      }, 1000);
+      }, 500);
       // console.log(`Load Items for ${day.year}-${day.month}`);
     }
   
@@ -291,7 +292,7 @@ class AgendaScreen extends React.Component<Props,State> {
                 // Max amount of months allowed to scroll to the past. Default = 50
                 pastScrollRange={1}
                 // Max amount of months allowed to scroll to the future. Default = 50
-                futureScrollRange={50}
+                futureScrollRange={12}
                 // Enable or disable scrolling of calendar list
                 // markingType={'period'}
                 // markedDates={{
@@ -334,7 +335,7 @@ class AgendaScreen extends React.Component<Props,State> {
         console.log(tareas)
         this.setState({agenda:tareas})
       })
-      .catch(error =>this.mensajeShow(error.message,error.status,2))
+      .catch(error =>this.mensajeShow(error.message,error.status,1))
     }
 }
 const styles = StyleSheet.create({
@@ -344,7 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
-    marginTop: 17
+    marginTop: 17,
   },
   emptyDate: {
     height: 80,

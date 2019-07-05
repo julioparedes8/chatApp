@@ -2,7 +2,8 @@ import axios from 'axios';
 import { JsogService } from 'jsog-typescript'
 import { JsogObject } from 'jsog-typescript/dist/model/JsogObject';
 //url del servidor
-let url='http://10.10.1.81:8008/'
+//let url='http://10.10.1.81:8008/'
+let url='http://macropro.ddns.net:8080/'
 const jsog = new JsogService();
 //json de la configuracion para pasar parametros a la api axios
 class Api{
