@@ -389,8 +389,6 @@ class CrearTareaScreen extends React.Component<Props,state> {
           //validaciones
           if (this.state.asunto==""){
             this.mensajeShow("Ingrese asunto",1)
-          } else if (this.state.contenido==""){
-            this.mensajeShow("Ingrese Contenido",1)
           } else{
             //hacer peticion
             console.log('aqui lo llamo es amadre')
@@ -537,7 +535,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
         checked:false,
         enabled:false
       })
-      this.props.navigation.navigate("Home")
+      this.props.navigation.push("Home",{index:4})
     }
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
@@ -676,6 +674,8 @@ class CrearTareaScreen extends React.Component<Props,state> {
             "id":destinatario
           }
         }
+        console.log('data'+data)
+        console.log('config'+config)
         this.insertarBueno(data,config,i,numero)
       }
     }
@@ -688,7 +688,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
             console.log('valor de i: '+valor);
             console.log('usuarios: '+this.state.usuarios.length);
             if((valor+1)==numUser){
-              this.mensajeShow("Asunto: "+baseResponse.resp.asunto+"\nContenido: "+baseResponse.resp.contenido,baseResponse.status)
+              this.mensajeShow("Asunto: "+baseResponse.resp.asunto,baseResponse.status)
             }
           })
         .catch(error => this.mensajeShow(error.message,error.status,1))

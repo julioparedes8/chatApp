@@ -6,8 +6,8 @@ import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import { Login } from '../entidades/login';
 import md5 from 'md5';
+import Usuario from '../entidades/Usuario'
 import DeviceInfo from 'react-native-device-info';
-import { Usuario } from '../entidades/Usuario';
 import { BaseResponse } from '../entidades/BaseResponse';
 import LocalStorage from '../localstorage';
 export interface Props{
@@ -143,7 +143,7 @@ class LoginScreen extends React.Component<Props,state> {
     LOCALSTORAGE.setIdUsuario(id.toString())
     LOCALSTORAGE.setUsuario(usuario.toString())
     LOCALSTORAGE.setRefresh(refresh)
-    this.props.navigation.navigate("Home")
+    this.props.navigation.navigate("Home",{index:3})
   }
   getUsuario(){
     console.log("entro");
@@ -154,7 +154,7 @@ class LoginScreen extends React.Component<Props,state> {
     API.getAll('UsuarioRest/getUsuarioByCodigo',config)
     .then(response => {
       const parsedJSON = response;
-        var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
+      var baseResponse: BaseResponse<Usuario>[] = parsedJSON as BaseResponse<Usuario>[];
       console.log(response);
       //si es un login correcto asignamos los valores de los tokens
       if (String(baseResponse.status)=='200'){
@@ -206,7 +206,9 @@ const styles = StyleSheet.create({
   },
   icon: {
     color: "#818586",
-    backgroundColor:'#EBF1F3'
+    backgroundColor:'#EBF1F3',
+    fontSize:25,
+    borderRadius: 35,
   },
   input:{
     //backgroundColor:'#EBF1F3'

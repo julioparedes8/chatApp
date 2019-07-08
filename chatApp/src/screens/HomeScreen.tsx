@@ -20,14 +20,14 @@ let LOCALSTORAGE = new localstorage();
 class HomeScreen extends React.Component<Props,State> {
   constructor(props: Props){
     super(props);
-    this.state = {index: 3} // el indice para la pantalla de inicio
+    const indice = this.props.navigation.getParam('index');
+    console.log('indice render'+indice)
+    //this.setState({index:indice})
+    this.state = {index: indice} // el indice para la pantalla de inicio
   }
   //aqui se actualiza el indice basandose en la pantalla que se selecciono para navegar  
   switchScreen(index:number) {
     this.setState({index: index})
-  }
-  componentWillReceiveProps(){
-    this.setState({index:3})
   }
   //abre una alerta para asegurar que se desea cerrar sesón
   cerrarSesion=()=>{

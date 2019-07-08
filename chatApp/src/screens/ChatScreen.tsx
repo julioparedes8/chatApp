@@ -70,7 +70,7 @@ class ChatScreen extends React.Component<Props,state> {
                     
                       <Button
                         transparent
-                        onPress={()=>this.props.navigation.navigate("Home")}
+                        onPress={()=>this.props.navigation.push("Home")}
                           >
                         <Icon type="Ionicons" name="ios-arrow-back" />
                       </Button>

@@ -205,20 +205,6 @@ class AgendaScreen extends React.Component<Props,State> {
     loadItems(day: { timestamp: number; }) {
       this.setState({selectedDate: day});
       this.upDateToken().then(res => this.peticion());
-      este.push(
-        {
-          name: 'primero',
-          fecha:'2019-07-05'
-        },
-        {
-          name: 'segundo',
-          fecha:'2019-07-05'
-        },
-        {
-          name: 'tercero',
-          fecha:'2019-07-10'
-        }
-      );
       setTimeout(() => {
         for (let i = -15; i < 85; i++) {
           const time = day.timestamp + i * 24 * 60 * 60 * 1000;
@@ -233,10 +219,19 @@ class AgendaScreen extends React.Component<Props,State> {
             for (let j = 0; j < this.state.agenda.length; j++) {
               const hora = this.state.agenda[j].fecha;
               if(strTime==hora){
-                  this.state.items[strTime].push({
-                    name: this.state.agenda[j].name,
-                    height: 80
-                  });
+                  if(this.state.agenda[j].contenido==''){
+                    this.state.items[strTime].push({
+                      asunto: this.state.agenda[j].asunto,
+                      contenido: this.state.agenda[j].contenido,
+                      height: 60
+                    });
+                  }else {
+                    this.state.items[strTime].push({
+                      asunto: this.state.agenda[j].asunto,
+                      contenido: this.state.agenda[j].contenido,
+                      height: 110
+                    });
+                  }
                 }
             }
           }
@@ -251,9 +246,9 @@ class AgendaScreen extends React.Component<Props,State> {
       // console.log(`Load Items for ${day.year}-${day.month}`);
     }
   
-    renderItem(item: { height: string | number | undefined; name: React.ReactNode; }) {
+    renderItem(item: { height: string | number | undefined; asunto: React.ReactNode;contenido: React.ReactNode; }) {
       return (
-        <View style={[styles.item, {height: item.height}]}><Text>{item.name}</Text></View>
+        <View style={[styles.item, {height: item.height}]}><Text>{item.asunto}</Text><Text>{item.contenido}</Text></View>
       );
     }
   
@@ -263,8 +258,8 @@ class AgendaScreen extends React.Component<Props,State> {
       );
     }
   
-    rowHasChanged(r1: { name: any; }, r2: { name: any; }) {
-      return r1.name !== r2.name;
+    rowHasChanged(r1: { asunto: any; }, r2: { asunto: any; }) {
+      return r1.asunto !== r2.asunto;
     }
   
     timeToString(time: string | number | Date) {
@@ -330,7 +325,7 @@ class AgendaScreen extends React.Component<Props,State> {
         let tareas=[]
         for(var i=0;i<baseResponse.resp.length;i++){
           let fecha:String=baseResponse.resp[i].fechaExpiracion
-          tareas.push({"name":baseResponse.resp[i].asunto,"fecha":fecha.substring(0,10)})
+          tareas.push({"asunto":baseResponse.resp[i].asunto,"contenido":baseResponse.resp[i].contenido,"fecha":fecha.substring(0,10)})
         }
         console.log(tareas)
         this.setState({agenda:tareas})
@@ -346,6 +341,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
     marginTop: 17,
+    alignItems:'center',
+    flexDirection: 'column',
   },
   emptyDate: {
     height: 80,
