@@ -223,12 +223,20 @@ class AgendaScreen extends React.Component<Props,State> {
                     this.state.items[strTime].push({
                       asunto: this.state.agenda[j].asunto,
                       contenido: this.state.agenda[j].contenido,
+                      fecha: this.state.agenda[j].fecha,
+                      expiracion: this.state.agenda[j].fechaExpiracion,
+                      recordatorio: this.state.agenda[j].fechaRecordatorio,
+                      tipo: this.state.agenda[j].tipo,
                       height: 60
                     });
                   }else {
                     this.state.items[strTime].push({
                       asunto: this.state.agenda[j].asunto,
                       contenido: this.state.agenda[j].contenido,
+                      fecha: this.state.agenda[j].fecha,
+                      expiracion: this.state.agenda[j].fechaExpiracion,
+                      recordatorio: this.state.agenda[j].fechaRecordatorio,
+                      tipo: this.state.agenda[j].tipo,
                       height: 110
                     });
                   }
@@ -246,12 +254,21 @@ class AgendaScreen extends React.Component<Props,State> {
       // console.log(`Load Items for ${day.year}-${day.month}`);
     }
   
-    renderItem(item: { height: string | number | undefined; asunto: React.ReactNode;contenido: React.ReactNode; }) {
+    renderItem(item: { height: string | number | undefined; asunto: String;contenido: String;fecha:String;fechaExpiracion:String,fechaRecordatorio:String;tipo:String }) {
       return (
-        <View style={[styles.item, {height: item.height}]}><Text>{item.asunto}</Text><Text>{item.contenido}</Text></View>
+        <View style={[styles.item, {height: item.height}]}>
+            <Text onPress={() => this.presionoTarea(item)}>{item.asunto}</Text>
+            <Text onPress={() => this.presionoTarea(item)}>{item.contenido}</Text>
+        </View>
       );
     }
-  
+    presionoTarea=(item:any)=>{
+      if (item.contenido==''){
+        Alert.alert('Tarea','Asunto: '+ item.asunto+'\nFecha Expiración: '+item.expiracion+'\nFecha Recordatorio: '+item.recordatorio+'\nTipo: '+item.tipo)
+      }else {
+        Alert.alert('Tarea','Asunto: '+ item.asunto+'\nContenido: '+item.contenido+'\nFecha Expiración: '+item.expiracion+'\nFecha Recordatorio: '+item.recordatorio+'\nTipo: '+item.tipo)
+      }
+    }
     renderEmptyDate() {
       return (
         <View style={styles.emptyDate}><Text></Text></View>
@@ -324,8 +341,9 @@ class AgendaScreen extends React.Component<Props,State> {
         //console.log(baseResponse.resp[0].sysGrupo.nombre);
         let tareas=[]
         for(var i=0;i<baseResponse.resp.length;i++){
-          let fecha:String=baseResponse.resp[i].fechaExpiracion
-          tareas.push({"asunto":baseResponse.resp[i].asunto,"contenido":baseResponse.resp[i].contenido,"fecha":fecha.substring(0,10)})
+          let fechaExp:String=baseResponse.resp[i].fechaExpiracion
+          let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+          tareas.push({"asunto":baseResponse.resp[i].asunto,"contenido":baseResponse.resp[i].contenido,"fecha":fechaExp.substring(0,10),"fechaExpiracion":fechaExp.substring(0,10)+' '+fechaExp.substring(11,19),"fechaRecordatorio":fechaRec.substring(0,10)+' '+fechaRec.substring(11,19),"tipo":baseResponse.resp[i].tipo})
         }
         console.log(tareas)
         this.setState({agenda:tareas})

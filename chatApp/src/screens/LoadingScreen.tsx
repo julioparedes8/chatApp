@@ -24,7 +24,7 @@ export default class LoadingScreen extends React.Component<Props,State>{
     }
     componentDidUpdate(){
       //si existe sesión se navegará al appStack que son las pantallas de la app y si no al authStack que es el login
-      this.props.navigation.push(this.state.sesion ? 'App' : 'Auth',{index:'3'});
+      this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
     }
     render(){
         return (

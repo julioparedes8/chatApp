@@ -22,12 +22,19 @@ class HomeScreen extends React.Component<Props,State> {
     super(props);
     const indice = this.props.navigation.getParam('index');
     console.log('indice render'+indice)
-    //this.setState({index:indice})
-    this.state = {index: indice} // el indice para la pantalla de inicio
+      // el indice para la pantalla de inicio
+    if(indice==undefined){
+      this.state = {index: 3}
+    }else{
+      this.state = {index: indice}
+    }
   }
   //aqui se actualiza el indice basandose en la pantalla que se selecciono para navegar  
   switchScreen(index:number) {
     this.setState({index: index})
+  }
+  componentWillReceiveProps(){
+    this.setState({index: 3})
   }
   //abre una alerta para asegurar que se desea cerrar sesón
   cerrarSesion=()=>{
