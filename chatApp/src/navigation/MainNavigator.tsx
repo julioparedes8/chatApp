@@ -9,6 +9,7 @@ import MessagesScreen from '../screens/MessagesScreen';
 import EnviarMensajeScreen from '../screens/EnviarMensajeScreen';
 import LoadingScreen from '../screens/LoadingScreen';
 import CrearTareaScreen from '../screens/CrearTareaScreen';
+import ModificarTareaScreen from '../screens/ModificarTareaScreen';
 //import DrawerNavigator from './DrawerNavigator';
 
 // Implementation para navegar entre pantallas
@@ -41,6 +42,9 @@ const MainNavigator= createStackNavigator(
       },
       CrearTarea:{
         screen:CrearTareaScreen
+      },
+     ModificarTarea:{
+        screen:ModificarTareaScreen
       }
       
   },

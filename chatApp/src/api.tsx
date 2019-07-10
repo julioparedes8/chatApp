@@ -2,8 +2,8 @@ import axios from 'axios';
 import { JsogService } from 'jsog-typescript'
 import { JsogObject } from 'jsog-typescript/dist/model/JsogObject';
 //url del servidor
-//let url='http://10.10.1.81:8008/'
-let url='http://macropro.ddns.net:8080/'
+let url='http://10.10.1.81:8008/'
+//let url='http://macropro.ddns.net:8080/'
 const jsog = new JsogService();
 //json de la configuracion para pasar parametros a la api axios
 class Api{
@@ -158,9 +158,14 @@ class Api{
     //actualiza una tabla, recibe como paramteros el noombre de la api, body y los headers
     async update(tablaRest : string,data:any,headers:any){
         return new Promise(function(resolve, reject) {
-            axios.post(url.concat( tablaRest ),data ,headers)
+            axios.put(url.concat( tablaRest ),data ,headers)
             .then(function (response) {
-                resolve(response.data)
+                let parsedJSON:JsogObject[]
+                parsedJSON=response.data
+                let data=jsog.deserializeArray(parsedJSON);
+                console.log(data)
+                console.log(response.data)
+                resolve(data)
             })
             .catch(function (error) {
                 //console.log(error.response

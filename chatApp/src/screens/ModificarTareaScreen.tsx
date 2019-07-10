@@ -13,6 +13,7 @@ import { Login } from '../entidades/login';
 import { Time } from 'react-native-gifted-chat';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
 import SysGrupo from '../entidades/SysGrupo';
+import { threadId } from 'worker_threads';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -26,6 +27,7 @@ interface state{
     selectedTipo?:string;
     checked:boolean;
     enabled:boolean;
+    disableAll:boolean;
     asunto:string;
     contenido:string;
     refresh?: String;
@@ -34,38 +36,38 @@ interface state{
     id?:String;
     usuario?:String;
     grupos:any;
-    usuarios:any
+    usuarios:any;
+    modificar:boolean
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
 let config={}
 let config2={}
 let config3={}
+let idCreador:string
+let idTarea:string
+let nomCreador:string
+let descartada:Number
+let leido:Number
 let token=""
 let refresh=""
 let fechaRecordatorio:any
 let groups:any
-class CrearTareaScreen extends React.Component<Props,state> {
+class ModificarTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      //sacamos la fecha y hora actual para mostrar en el comoponente
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, '0');
-      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-      var yyyy = today.getFullYear();
-      var hora= today.getHours()
-      var min = today.getMinutes()
-      var seg=today.getSeconds()
-      //console.log(pedo+' '+'timestamp= '+this.toTimestamp('2019/06/28 12:00'))
-      var horaBuena=this.agregarZero(hora)
-      var minBuena=this.agregarZero(min)
-      var segBuena=this.agregarZero(seg)
-      var times= horaBuena+':'+minBuena+':'+segBuena
-      var expTime=horaBuena+':'+minBuena
-      console.log('times: '+times)
-      let date:string;
-      date = yyyy + '-' + mm + '-' + dd;
-      this.state = {usuarios:[],grupos:[{"key":"1","value":"seleccionar"}],usuario:'', id:'',asunto:'',contenido:'',expiracionDate:date,expiracionTime:expTime,creacionTime:times,creacionDate: date,selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:'LLAMADA',checked: false,enabled: false,macADD:'',token: '',refresh:'' };
+        idTarea = this.props.navigation.getParam('idTarea');
+        nomCreador = this.props.navigation.getParam('nomCreador');
+      idCreador = this.props.navigation.getParam('idCreador');
+      descartada = this.props.navigation.getParam('descartada');
+      leido = this.props.navigation.getParam('leido');
+      const expiracion = this.props.navigation.getParam('expiracion');
+      const creacion = this.props.navigation.getParam('creacion');
+      const tipo = this.props.navigation.getParam('tipo');
+      const asunto = this.props.navigation.getParam('asunto');
+      const contenido = this.props.navigation.getParam('contenido');
+      console.log('Valores'+idTarea+' '+idCreador +' '+expiracion+' '+tipo+' '+asunto+' '+contenido)
+      this.state = {usuarios:[],grupos:[{"key":"1","value":"seleccionar"}],usuario:nomCreador, id:'',asunto:asunto,contenido:contenido,expiracionDate:expiracion.substring(0,10),expiracionTime:expiracion.substring(11,16),creacionTime:creacion.substring(11,19),creacionDate: creacion.substring(0,10),selectedAviso:'Al Momento',selectedGrupo:'',selectedTipo:tipo,checked: false,disableAll: true,enabled: false,modificar:false,macADD:'',token: '',refresh:'' };
       this.setDateCreacion = this.setDateCreacion.bind(this);
       this.setDateExpiracion = this.setDateExpiracion.bind(this);
       DeviceInfo.getMACAddress().then(mac => {
@@ -106,10 +108,17 @@ class CrearTareaScreen extends React.Component<Props,state> {
           console.log(response)
           this.setState({id:response})
           console.log(this.state.id)
+          console.log(this.state.id+' '+idCreador)
+        if(this.state.id==idCreador){
+            this.setState({
+                disableAll:false,
+                modificar:true
+            })
+        }
         })
         LOCALSTORAGE.getUsuario().then(response=>{
           console.log(response)
-          this.setState({usuario:response})
+          //this.setState({usuario:response})
           console.log(this.state.usuario)
           resolve();
         })
@@ -130,14 +139,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
                     
                     <Button
                       transparent
-                      onPress={()=>this.props.navigation.navigate("Home")}
+                      onPress={()=>this.props.navigation.pop()}
                         >
                       <Icon type="Ionicons" name="ios-arrow-back" />
                     </Button>
                   
                 </Left>
                   <Body style={{ flex:1}}>
-                    <Title  style={{ alignSelf: 'center'}}>Nueva Tarea</Title>
+                    <Title  style={{ alignSelf: 'center'}}>Ver Tarea</Title>
                   </Body>
                   <Right style={{ flex:1}}>
                     
@@ -213,6 +222,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                             style={{width: 140, marginLeft:2,marginRight:15}}
                             date={this.state.expiracionDate}
                             mode="date"
+                            disabled={this.state.disableAll}
                             format="YYYY-MM-DD"
                             confirmBtnText="Ok"
                             cancelBtnText="Cancelar"
@@ -235,6 +245,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                             date={this.state.expiracionTime}
                             mode="time"
                             format="HH:mm"
+                            disabled={this.state.disableAll}
                             is24Hour={true}
                             confirmBtnText="Ok"
                             cancelBtnText="Cancelar"
@@ -257,6 +268,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                   iosIcon={<Icon name="arrow-down" />}
                                   style={{ width: undefined}}
                                   placeholder="Seleccionar"
+                                  enabled={!this.state.disableAll}
                                   placeholderStyle={{ color: "#bfc6ea" }}
                                   placeholderIconColor="#007aff"
                                   selectedValue={this.state.selectedAviso}
@@ -353,6 +365,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                                 iosIcon={<Icon name="arrow-down" />}
                                 style={{ width: undefined}}
                                 placeholder="Seleccionar"
+                                enabled={!this.state.disableAll}
                                 placeholderStyle={{ color: "#bfc6ea" }}
                                 placeholderIconColor="#007aff"
                                 selectedValue={this.state.selectedTipo}
@@ -368,10 +381,10 @@ class CrearTareaScreen extends React.Component<Props,state> {
                         </View>
                       </View>
                       <View style={{ flexDirection: 'row',alignItems:'flex-start'}}>
-                          <Text style={{marginLeft:22,marginRight:5,marginTop:14,marginBottom:14}}>Asunto :</Text>
+                          <Text  style={{marginLeft:22,marginRight:5,marginTop:14,marginBottom:14}}>Asunto :</Text>
                           <TextInput
-                           style={{marginRight:5,marginTop:10,textAlignVertical:'top',marginBottom:10,color: '#616161',height:40,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}}
-                            editable = {true}
+                           style={{marginRight:5,marginTop:10,marginBottom:10,textAlignVertical:'top',color: '#616161',height:40,flex:1,borderWidth: 2,borderColor: '#F7F7F7',}}
+                            editable = {!this.state.disableAll}
                             multiline = {true}
                             numberOfLines = {1}
                             onChangeText={(asunto) => this.setState({asunto})}
@@ -382,7 +395,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
                           <Text style={{marginRight:5,marginTop:14,marginBottom:14}}>Contenido :</Text>
                           <TextInput
                             style={{marginRight:5,marginTop:10,marginBottom:10,height:130,textAlignVertical:'top',color: '#616161',flex:1,borderWidth: 2,borderColor: '#F7F7F7',}}
-                            editable = {true}
+                            editable = {!this.state.disableAll}
                             multiline = {true}
                             numberOfLines = {2}
                             onChangeText={(contenido) => this.setState({contenido})}
@@ -390,9 +403,11 @@ class CrearTareaScreen extends React.Component<Props,state> {
                             />
                       </View>
                   </View>
-                    <Button rounded block info  style={styles.button} onPress={this.crearTarea} >
-                        <Text>Crear Tarea</Text>
-                    </Button>
+                    { this.state.modificar && 
+                        <Button rounded block info  style={styles.button} onPress={this.peticion} >
+                        <Text>Guardar Tarea</Text>
+                        </Button>
+                    }
                 </Form>
               </Content>
             </Container>
@@ -480,7 +495,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
         );
       } else if (status==200){
         Alert.alert(
-          "Tarea agregada exitosamente",
+          "Tarea modificada exitosamente",
           mensaje,
           [
             {text: 'OK', 
@@ -673,13 +688,14 @@ class CrearTareaScreen extends React.Component<Props,state> {
         console.log('valor de numero: '+numero);
         let destinatario=this.state.usuarios[i].id
         var data:any={
+            "id":idTarea,
           "asunto": this.state.asunto,
           "contenido": this.state.contenido,
-          "descartada": 0,
+          "descartada": descartada,
           "fechaCreacion": this.state.creacionDate+'T'+this.state.creacionTime,
           "fechaExpiracion": this.state.expiracionDate+'T'+this.state.expiracionTime,
           "fechaRecordatorio": fechaRecordatorio,
-          "leido":0,
+          "leido":leido,
           "tipo": this.state.selectedTipo,
           "creador":{
             "id": this.state.id
@@ -694,7 +710,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
       }
     }
     insertarBueno(data:any,config:any,valor:number,numUser:number){
-      API.post('SysTareaRest',data,config)
+      API.update('SysTareaRest',data,config)
           .then(response => {
             const parsedJSON = response;
             var baseResponse: BaseResponse<Tarea>[] = parsedJSON as BaseResponse<Tarea>[];
@@ -702,7 +718,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
             console.log('valor de i: '+valor);
             console.log('usuarios: '+this.state.usuarios.length);
             if((valor+1)==numUser){
-              this.mensajeShow("Asunto: "+baseResponse.resp.asunto,baseResponse.status)
+              this.mensajeShow("Se actualizo correctamente",baseResponse.status)
             }
           })
         .catch(error => this.mensajeShow(error.message,error.status,1))
@@ -716,4 +732,4 @@ const styles = StyleSheet.create({
     backgroundColor:'#70CCF6'
   }
 });
-export default CrearTareaScreen;
+export default ModificarTareaScreen;
