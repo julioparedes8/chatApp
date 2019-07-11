@@ -45,7 +45,7 @@ const MainNavigator= createStackNavigator(
       },
      ModificarTarea:{
         screen:ModificarTareaScreen
-      }
+      },
       
   },
   {

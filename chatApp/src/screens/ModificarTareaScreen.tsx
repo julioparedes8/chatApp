@@ -13,7 +13,6 @@ import { Login } from '../entidades/login';
 import { Time } from 'react-native-gifted-chat';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
 import SysGrupo from '../entidades/SysGrupo';
-import { threadId } from 'worker_threads';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -56,8 +55,8 @@ let groups:any
 class ModificarTareaScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-        idTarea = this.props.navigation.getParam('idTarea');
-        nomCreador = this.props.navigation.getParam('nomCreador');
+      idTarea = this.props.navigation.getParam('idTarea');
+      nomCreador = this.props.navigation.getParam('nomCreador');
       idCreador = this.props.navigation.getParam('idCreador');
       descartada = this.props.navigation.getParam('descartada');
       leido = this.props.navigation.getParam('leido');
@@ -139,7 +138,7 @@ class ModificarTareaScreen extends React.Component<Props,state> {
                     
                     <Button
                       transparent
-                      onPress={()=>this.props.navigation.pop()}
+                      onPress={()=>this.props.navigation.navigate("Home")}
                         >
                       <Icon type="Ionicons" name="ios-arrow-back" />
                     </Button>
@@ -564,13 +563,21 @@ class ModificarTareaScreen extends React.Component<Props,state> {
         checked:false,
         enabled:false
       })
+       idCreador=''
+       idTarea=''
+       nomCreador=''
+       descartada=0
+       leido=0
+      //this.props.navigation.dismiss()
       this.props.navigation.push("Home",{index:4})
+      //this.props.navigation.pop()
     }
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
       //sacar la fecha de recordatorio
-      let fecha = new Date(this.state.expiracionDate+' '+this.state.expiracionTime).getTime() / 1000
+      let fecha = new Date(this.state.expiracionDate+'T'+this.state.expiracionTime).getTime() / 1000
       console.log('timestamp'+fecha)
+      //Alert.alert('fecha',fecha.toString())
       let fechaStamp:any
       //Si el aviso es al momento se agrega la misma fecha de expiracion
       //si no hay aviso no se agrega nada
@@ -710,6 +717,12 @@ class ModificarTareaScreen extends React.Component<Props,state> {
       }
     }
     insertarBueno(data:any,config:any,valor:number,numUser:number){
+      console.log(data)
+      console.log(config)
+      const myObjStr = JSON.stringify(data);
+      const myObjStr2 = JSON.stringify(config);
+      //Alert.alert('data',myObjStr)
+      //Alert.alert('config',myObjStr2)
       API.update('SysTareaRest',data,config)
           .then(response => {
             const parsedJSON = response;

@@ -554,7 +554,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
     //realiza la petición para hacer el insert de la tarea
     peticion=()=>{
       //sacar la fecha de recordatorio
-      let fecha = new Date(this.state.expiracionDate+' '+this.state.expiracionTime).getTime() / 1000
+      let fecha = new Date(this.state.expiracionDate+'T'+this.state.expiracionTime).getTime() / 1000
       console.log('timestamp'+fecha)
       let fechaStamp:any
       //Si el aviso es al momento se agrega la misma fecha de expiracion

@@ -8,6 +8,7 @@ import MessagesScreen from './MessagesScreen';
 import AlertaScreen from './AlertaScreen';
 import AvisoScreen from './AvisoScreen';
 import AgendaScreen from './AgendaScreen';
+import { NavigationActions } from 'react-navigation'
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
 };
@@ -55,12 +56,12 @@ class HomeScreen extends React.Component<Props,State> {
   }
   //se ejecuta al presionar el botton del header de la pantalla de AGENDA y te navega a otra pantalla
   crearTarea=()=>{
-    this.props.navigation.navigate('CrearTarea')
+    this.props.navigation.push('CrearTarea')
   }
   //cierra sesión, elimina los tokens del LS y te navega a la pantalla del login
   salir=()=>{
     LOCALSTORAGE.borrarSesion()
-    this.props.navigation.navigate("Login")
+    this.props.navigation.push("Login")
     this.setState({index:3})
   }
   //Aqui se muestra el footer y basandose en el indice que definimos para cada pantalla

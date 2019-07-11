@@ -278,10 +278,10 @@ class AgendaScreen extends React.Component<Props,State> {
     presionoTarea=(item:any)=>{
       if (item.contenido==''){
         //Alert.alert('Tarea','Asunto: '+ item.asunto+'\nFecha Expiración: '+item.expiracion+'\nFecha Recordatorio: '+item.recordatorio+'\nTipo: '+item.tipo)
-        this.props.navigation.navigate("ModificarTarea",{idTarea:item.id,idCreador:item.idCreador,nomCreador:item.nomCreador,descartada:item.descartada,leido:item.leido,creacion:item.creacion,expiracion:item.expiracion,tipo:item.tipo,asunto:item.asunto,contenido:''})
+        this.props.navigation.push("ModificarTarea",{idTarea:item.id,idCreador:item.idCreador,nomCreador:item.nomCreador,descartada:item.descartada,leido:item.leido,creacion:item.creacion,expiracion:item.expiracion,tipo:item.tipo,asunto:item.asunto,contenido:''})
       }else {
         //Alert.alert('Tarea','Asunto: '+ item.asunto+'\nContenido: '+item.contenido+'\nFecha Expiración: '+item.expiracion+'\nFecha Recordatorio: '+item.recordatorio+'\nTipo: '+item.tipo)
-        this.props.navigation.navigate("ModificarTarea",{idTarea:item.id,idCreador:item.idCreador,nomCreador:item.nomCreador,descartada:item.descartada,leido:item.leido,creacion:item.creacion,expiracion:item.expiracion,tipo:item.tipo,asunto:item.asunto,contenido:item.contenido})
+        this.props.navigation.push("ModificarTarea",{idTarea:item.id,idCreador:item.idCreador,nomCreador:item.nomCreador,descartada:item.descartada,leido:item.leido,creacion:item.creacion,expiracion:item.expiracion,tipo:item.tipo,asunto:item.asunto,contenido:item.contenido})
       }
     }
     renderEmptyDate() {

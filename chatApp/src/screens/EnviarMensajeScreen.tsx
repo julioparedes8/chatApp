@@ -1,8 +1,7 @@
 import React from 'react';
-import { Container, Header, Content, Form, Item, Input, Button,Left,Icon,Body,Right,Title,Text } from 'native-base';
+import { Container, Header, Content, Form, Item, Input, Button,Left,Icon,Body,Right,Title,Text, ListItem, Thumbnail, List } from 'native-base';
 import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
-import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
@@ -12,36 +11,45 @@ class EnviarMensajeScreen extends React.Component<Props> {
     constructor(props: Props){
       super(props);
     }
+    handleClick=()=>{
+      const {navigate}= this.props.navigation
+      navigate('Chat')
+      //this.props.navigation.navigate("Login")
+      // Call method from parent
+      //this.props.onPress();
+    }
     render(){
           return (
             <Container>
-              <Header style={{backgroundColor:"#70CCF6"}}>
-              <Left style={{ flex:1}}>
-                    
-                    <Button
+              <Header searchBar style={{backgroundColor:"#70CCF6"}}>
+              <Left>
+                <Button
                       transparent
                       onPress={()=>this.props.navigation.navigate("Home")}
                         >
                       <Icon type="Ionicons" name="ios-arrow-back" />
-                    </Button>
-                  
+                    </Button>  
+              
                 </Left>
-                  <Body style={{ flex:1}}>
-                    <Title  style={{ alignSelf: 'center'}}>Nuevo Chat</Title>
-                  </Body>
-                  <Right style={{ flex:1}}>
-                    
-                  </Right>
+                <Body >
+                <Item>
+            <Icon name="ios-search" />
+            <Input placeholder="Search" />
+            <Icon name="ios-people" />
+          </Item>
+                </Body>
               </Header>
-              <Content>
-                <Form>
-                  <Item>
-                    <Input placeholder="Usuario" />
-                  </Item>
-                  <Button rounded block info  style={styles.button}  onPress={()=>this.props.navigation.navigate("Chat")} >
-                    <Text>Iniciar Chat</Text>
-                  </Button>
-                </Form>
+              <Content padder>
+                <List>
+                  <ListItem avatar button={true} onPress={this.handleClick}>
+                    <Left>
+                      <Thumbnail source={require('../../assets/user.png')} />
+                    </Left>
+                    <Body>
+                      <Text>Pito Perez</Text>
+                    </Body>
+                  </ListItem>
+                </List>
               </Content>
             </Container>
           )
