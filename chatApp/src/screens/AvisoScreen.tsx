@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {View,StyleSheet,FlatList, AsyncStorage} from 'react-native'
 import api from '../api';
-import FooterComponent from '../components/Footer'
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 export interface Props {

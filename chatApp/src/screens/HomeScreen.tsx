@@ -84,7 +84,7 @@ class HomeScreen extends React.Component<Props,State> {
     }           
     return (
       <Container>
-        <Header style={{backgroundColor:"#70CCF6"}}>
+        <Header style={{backgroundColor:"#70CCF6",height:70}}>
         <Left style={{ flex:1}}>
             {this.state.index==3 && 
               <Button
@@ -117,21 +117,21 @@ class HomeScreen extends React.Component<Props,State> {
         <Content padder>
           <AppComponent navigation={this.props.navigation}/>
         </Content>
-        <Footer>
-          <FooterTab style={{backgroundColor:"#70CCF6"}}>
-            <Button vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
+        <Footer style={{height:70}}>
+          <FooterTab style={{backgroundColor:"#70CCF6",height:70}}>
+            <Button style={{height:70}} vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
               <Icon name="ios-alarm" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Alertas</Text>
             </Button>
-            <Button vertical  onPress={() => this.switchScreen(2) } active={this.state.index === 2}>
+            <Button style={{height:70}} vertical  onPress={() => this.switchScreen(2) } active={this.state.index === 2}>
               <Icon name="md-notifications" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Avisos</Text>
             </Button>
-            <Button vertical onPress={() => this.switchScreen(3) } active={this.state.index === 3}>
+            <Button  style={{height:70}} vertical onPress={() => this.switchScreen(3) } active={this.state.index === 3}>
               <Icon name="ios-chatbubbles" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Chats</Text>
             </Button>
-            <Button vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
+            <Button  vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
               <Icon name="ios-calendar" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Agenda</Text>
             </Button>

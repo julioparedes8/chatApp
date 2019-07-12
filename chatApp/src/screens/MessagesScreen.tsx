@@ -22,88 +22,130 @@ class MessagesScreen extends React.Component<Props> {
             return (
               <Content padder>
                 <List>
-                  <ListItem avatar button={true} onPress={this.handleClick}>
+                  <ListItem thumbnail button={true} onPress={this.handleClick}>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note >3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
-                  <ListItem avatar>
+                  <ListItem thumbnail>
                     <Left>
                       <Thumbnail source={require('../../assets/user.png')} />
                     </Left>
                     <Body>
                       <Text>Emisor</Text>
-                      <Text note>Este es el contenido del mensaje . .</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
                     </Body>
                     <Right>
-                      <Text note>3:43 pm</Text>
+                      
+                        <Text note>3:45pm</Text>
+                      
+                    </Right>
+                  </ListItem>
+                  <ListItem thumbnail>
+                    <Left>
+                      <Thumbnail source={require('../../assets/user.png')} />
+                    </Left>
+                    <Body>
+                      <Text>Emisor</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
+                    </Body>
+                    <Right>
+                      
+                        <Text note>3:45pm</Text>
+                      
+                    </Right>
+                  </ListItem>
+                  <ListItem thumbnail>
+                    <Left>
+                      <Thumbnail source={require('../../assets/user.png')} />
+                    </Left>
+                    <Body>
+                      <Text>Emisor</Text>
+                      <Text note numberOfLines={1}>Aqui va el mensaje . .</Text>
+                    </Body>
+                    <Right>
+                      
+                        <Text note>3:45pm</Text>
+                      
                     </Right>
                   </ListItem>
                 </List>
