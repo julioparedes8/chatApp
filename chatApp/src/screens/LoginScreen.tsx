@@ -28,6 +28,7 @@ let token=""
 let refresh=""
 let id="";
 let usuario="";
+let isAdmin:String=''
 class LoginScreen extends React.Component<Props,state> {
   constructor(props: Readonly<Props>){
     super(props);
@@ -143,6 +144,7 @@ class LoginScreen extends React.Component<Props,state> {
     LOCALSTORAGE.setIdUsuario(id.toString())
     LOCALSTORAGE.setUsuario(usuario.toString())
     LOCALSTORAGE.setRefresh(refresh)
+    LOCALSTORAGE.setIsAdmin(isAdmin.toString())
     this.props.navigation.navigate("Home",{index:3})
   }
   getUsuario(){
@@ -161,7 +163,8 @@ class LoginScreen extends React.Component<Props,state> {
         id=baseResponse.resp.id
         console.log("id: " +id)
         usuario=baseResponse.resp.codigo
-        console.log("usuario: " +usuario)
+        isAdmin=baseResponse.resp.nivelAccesoSistema
+        console.log("isAdmin: " +isAdmin)
         this.loginCorrecto()
       }
       //llamamos a la siguiente función para guardar id en localStorage

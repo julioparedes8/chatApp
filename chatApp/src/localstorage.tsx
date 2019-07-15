@@ -30,6 +30,16 @@ class LocalStorage{
             // saving error
           }
     }
+    //guarda si es admin en el local storage
+    setIsAdmin=async (id:any)=>{
+      try {
+        await AsyncStorage.setItem('IsAdmin', (id))
+        const unico = await AsyncStorage.getItem('IsAdmin')
+        console.log("localStorage isAdmin: "+unico)
+      } catch (e) {
+        // saving error
+      }
+    }
     //guarda el token en el local storage
     setUsuario=async (user:any)=>{
       try {
@@ -78,6 +88,7 @@ class LocalStorage{
           await AsyncStorage.removeItem('Refresh')
           await AsyncStorage.removeItem('IdUsuario')
           await AsyncStorage.removeItem('Usuario')
+          await AsyncStorage.removeItem('IsAdmin')
           console.log('ya se removio')
           const tkn = await AsyncStorage.getItem('Token')
           console.log(tkn)
@@ -87,6 +98,8 @@ class LocalStorage{
           console.log(unico)
           const user = await AsyncStorage.getItem('Usuario')
           console.log(user)
+          const isAdmin = await AsyncStorage.getItem('IsAdmin')
+          console.log(isAdmin)
         } catch (e) {
           // saving error
         }
@@ -139,6 +152,22 @@ class LocalStorage{
           }
           //this.setState({sesion:true})
           return rfs
+      } catch (e) {
+      // saving error
+      }
+    }
+    //Regresa el token almacenado en el local storage para hacer peticiones 
+    getIsAdmin=async ()=>{
+      try {
+          //await AsyncStorage.setItem('Token', JSON.stringify('logueado'))
+          const admin = await AsyncStorage.getItem('IsAdmin')
+          //console.log(tkn)
+          if (admin==null){
+              //this.setState({sesion:false})
+              return ""
+          }
+          //this.setState({sesion:true})
+          return admin
       } catch (e) {
       // saving error
       }

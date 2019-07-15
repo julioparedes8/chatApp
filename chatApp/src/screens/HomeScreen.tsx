@@ -131,7 +131,7 @@ class HomeScreen extends React.Component<Props,State> {
               <Icon name="ios-chatbubbles" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Chats</Text>
             </Button>
-            <Button  vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
+            <Button style={{height:70}} vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
               <Icon name="ios-calendar" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Agenda</Text>
             </Button>
