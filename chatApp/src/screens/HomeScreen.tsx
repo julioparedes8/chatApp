@@ -120,7 +120,7 @@ class HomeScreen extends React.Component<Props,State> {
         <Footer style={{height:70}}>
           <FooterTab style={{backgroundColor:"#70CCF6",height:70}}>
             <Button style={{height:70}} vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
-              <Icon name="ios-alarm" style={{color:"white"}}/>
+              <Icon type='Feather' name="alert-triangle" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Alertas</Text>
             </Button>
             <Button style={{height:70}} vertical  onPress={() => this.switchScreen(2) } active={this.state.index === 2}>
@@ -132,7 +132,7 @@ class HomeScreen extends React.Component<Props,State> {
               <Text style={{color:"white"}}>Chats</Text>
             </Button>
             <Button style={{height:70}} vertical onPress={() => this.switchScreen(4) } active={this.state.index === 4}>
-              <Icon name="ios-calendar" style={{color:"white"}}/>
+              <Icon type='FontAwesome' name="calendar-o" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Agenda</Text>
             </Button>
           </FooterTab>

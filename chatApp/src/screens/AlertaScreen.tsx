@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View,StyleSheet,FlatList, AsyncStorage, Alert} from 'react-native'
+import {View,StyleSheet,FlatList, AsyncStorage, Alert, Platform} from 'react-native'
 import api from '../api';
 import { BaseResponse } from '../entidades/BaseResponse';
 import { Login } from '../entidades/Login';
@@ -7,6 +7,7 @@ import localstorage from '../localstorage';
 import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail } from "native-base";
+import SysAlerta from '../entidades/SysAlerta';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -14,6 +15,10 @@ interface State {
   refresh?: String;
   token?:String;
   macADD?:String;
+  id?:String;
+  usuario?:String;
+  isAdmin?:String;
+  alertas?:any;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -27,7 +32,8 @@ class AlertaScreen extends React.Component<Props,State> {
       this.state = {
         token: '',
         refresh:'',
-        macADD:''
+        macADD:'',
+        alertas:[]
       }
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
@@ -35,39 +41,57 @@ class AlertaScreen extends React.Component<Props,State> {
       });
       this.upDateToken()
     }
-    upDateToken(){
-      LOCALSTORAGE.getToken().then(response=>{
-        this.setState({token:response})
-        console.log(this.state.token)
-        config = {
-          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-        }
-      })
-      LOCALSTORAGE.getRefresh().then(response=>{
-        this.setState({refresh:response})
-        console.log(this.state.refresh)
-        config2 = {
-          headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
-        }
-      })
-    }
     componentDidMount(){
-      this.upDateToken()
+      //arrayHolder = contactos
+        this.upDateToken().then(res => this.hacerValidacion())
+      //this.upDateToken().then(res => this.getUsuarios());
+      //this.setState({dataSource:contactos})
     }
-    peticion = () =>{
-      API.getAll('SysTareaRest',config)
-      .then(response => {
-        const parsedJSON = response;
-        //var baseResponse: BaseResponse[] = parsedJSON as BaseResponse[];
-        //console.log('MESSAGE: ' +baseResponse.message);
-       // console.log('STATUS: ' +baseResponse.status);
-       // console.log('Resp: ' +baseResponse.resp);
-       // this.mensajeShow(baseResponse.message,baseResponse.status)
-        //this.mensajeShow(login.message,login.status)
-      })
-      .catch(error =>this.mensajeShow(error.message,error.status))
+    hacerValidacion(){
+      if(this.state.isAdmin=='0'){
+       this.getAlertas()
+      }else {
+        this.getAlertasXGrupo()
+      }
     }
-    refresh=()=>{
+    upDateToken(){
+      return new Promise((resolve, reject) => {
+        LOCALSTORAGE.getToken().then(response=>{
+          this.setState({token:response})
+          console.log(this.state.token)
+          config = {
+            headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+          }
+        })
+        LOCALSTORAGE.getRefresh().then(response=>{
+          this.setState({refresh:response})
+          console.log(this.state.refresh)
+          config2 = {
+            headers: { 'tenantId':'macropro','refreshToken': this.state.refresh,'Content-Type': 'application/json','MacAddress':this.state.macADD }
+          }
+        })
+        LOCALSTORAGE.getIdUsuario().then(response=>{
+          console.log(response)
+          this.setState({id:response})
+          console.log(this.state.id)
+        })
+        LOCALSTORAGE.getIsAdmin().then(response=>{
+          console.log(response)
+          this.setState({isAdmin:response})
+          console.log(this.state.isAdmin)
+        })
+        LOCALSTORAGE.getUsuario().then(response=>{
+          console.log(response)
+          this.setState({usuario:response})
+          console.log(this.state.usuario)
+          resolve();
+        })
+      });
+    }
+     //peticion para hacer el refresh por que se vencio el token
+    //si el status es 200 entonces llama otra funcion  para actualizar los tokens
+    //si es 400 significa que ya se venció el refresh tambien y procede a mostrar el porque y cierra sesión automaticamente
+    refresh(peticion:any){
       API.sesion('refresh',config2)
     .then(response => {
       const parsedJSON = response;
@@ -78,124 +102,255 @@ class AlertaScreen extends React.Component<Props,State> {
       if (String(login.status)=='200'){
         token=login.resp.token
         refresh=login.resp.refresh
-        this.refreshCorrecto()
+        console.log('en el refresh')
+        this.refreshCorrecto(peticion)
+      }else if (String(login.status)=='400'){
+        this.mensajeShow(login.message,login.status)
       }
-    this.mensajeShow(login.message,login.status)
     })
     .catch(error => this.mensajeShow(error.response.message,error.response.status))
     }
-    refreshCorrecto=()=>{
-      LOCALSTORAGE.setToken(token)
-      LOCALSTORAGE.setRefresh(refresh)
-      this.upDateToken()
-      //this.peticion()
+    //actualiza los tokens en el local storage y despues en el mismo componente
+    refreshCorrecto(peticion:any){
+          LOCALSTORAGE.setToken(token)
+          LOCALSTORAGE.setRefresh(refresh)
+          console.log(peticion+'refreshCorrecto')
+          if(peticion==1){
+            //carga el estado para despues hacer la peticion del insert
+            this.upDateToken().then(res => this.getAlertas());
+          } else if(peticion==2){
+            this.upDateToken().then(res => this.getAlertasXGrupo());
+          }
     }
-    mensajeShow = (mensaje:any,status:any)=>{
-      if (status==200){
+    //peticion de alertas cuando es administrador
+    getAlertas(){
+      console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
+      API.getAll('SysAlertaRest',config)
+      .then(response => {
+        const parsedJSON = response;
+        var baseResponse: BaseResponse<SysAlerta>[] = parsedJSON as BaseResponse<SysAlerta>[];
+        console.log(baseResponse.message);
+        console.log(baseResponse.status);
+        console.log(baseResponse.usoEnTimbrado);
+        console.log(baseResponse.resp.length);
+        let alertas: any[]=[]
+        for(var i=0;i<baseResponse.resp.length;i++){
+          //let nombre:String=baseResponse.resp[i].nombre
+          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+          if(baseResponse.resp[i].prioridad=='ALTA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+          }
+        }
+        for(var i=0;i<baseResponse.resp.length;i++){
+          //let nombre:String=baseResponse.resp[i].nombre
+          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+          if(baseResponse.resp[i].prioridad=='MEDIA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+          }
+        }
+        for(var i=0;i<baseResponse.resp.length;i++){
+          //let nombre:String=baseResponse.resp[i].nombre
+          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+          if(baseResponse.resp[i].prioridad=='BAJA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+          }
+        }
+        console.log(alertas)
+        //arrayHolder = users;
+        this.setState({alertas:alertas})
+      })
+      .catch(error =>this.mensajeShow(error.message,error.status,1))
+    }
+    //peticion de alertas cuando no es administrador
+    getAlertasXGrupo(){
+      console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
+      API.post('SysGrupoUsuarioRest/getByUsuarioId',this.state.id,config)
+      .then(response => {
+        const parsedJSON = response;
+        var baseResponse: BaseResponse<SysAlerta>[] = parsedJSON as BaseResponse<SysAlerta>[];
+        console.log(baseResponse.message);
+        console.log(baseResponse.status);
+        console.log(baseResponse.usoEnTimbrado);
+        console.log(baseResponse.resp.length);
+        let users: any[]=[]
+        for(var i=0;i<baseResponse.resp.length;i++){
+          if(baseResponse.resp[i].sysGrupo.tipo=='MENSAJES'){
+            console.log('si es mensajes');
+            //let nombre:String=baseResponse.resp[i].nombre
+            //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+            console.log(baseResponse.resp[i].sysGrupo.listGrupoUsuario.length);
+            for(var j=0;j<baseResponse.resp[i].sysGrupo.listGrupoUsuario.length;j++){
+              if(this.state.id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
+
+              }else {
+                if(users.length==0){
+                  console.log('vale 0');
+                  users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
+                }else{
+                  let existe=false
+                  console.log('length'+users.length);
+                  for(var k=0;k<users.length;k++){
+                    console.log('users'+users[k].id+' '+baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id);
+                    if(users[k].id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
+                    existe=false
+                    k=5
+                    }else{
+                      existe=true
+                    }
+                  }
+                  if(existe==true){
+                    users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
+                    console.log('aqui');
+                  }
+                  existe=false
+                }
+              }
+            }
+            //if(this.state.id==baseResponse.resp[i].id){
+
+            //}else {
+            // users.push({"nombre":baseResponse.resp[i].nombre,"imagen":"../../assets/user.png"})
+            //}
+          }else{
+
+          }
+        }
+        console.log(users)
+        //arrayHolder = users;
+        //this.setState({dataSource:users})
+      })
+      .catch(error =>this.mensajeShow(error.message,error.status,2))
+    }
+    //muestra mensajes/alertas dependiendo de status ya sea de peticion o de validacion
+    mensajeShow = (mensaje:any,status:any,peticion?:any)=>{
+      if (status==1){
         Alert.alert(
-          'Peticion correcta',
+          "Error de validación",
           mensaje,
           [
-            {text: 'OK', onPress: () => ''},
+            {text: 'OK', 
+            onPress: () => ""},
+          ],
+          {cancelable: false},
+        );
+      } else if (status==200){
+        Alert.alert(
+          "Se sacaron los usuarios correctamente",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => 'this.limpiar()'},
           ],
           {cancelable: false},
         );
       }else if(status==300){
         Alert.alert(
-          'Error',
+          'Inicio de Sesión',
           mensaje,
           [
-            {text: 'OK', onPress: () => ''},
+            {text: 'OK', onPress: () => 'cerrar'},
           ],
           {cancelable: false},
         );
-      }else if(status==400){
+      }else if (status==400){
         Alert.alert(
-          'Error',
+          "Error",
           mensaje,
           [
-            {text: 'OK', onPress: () => this.salir()},
+            {text: 'OK', 
+            onPress: () =>this.salir()},
           ],
           {cancelable: false},
         );
-      }else if(status==401){
-        Alert.alert(
-          'Error',
-          mensaje,
-          [
-            {text: 'OK', onPress: () => this.refresh()},
-          ],
-          {cancelable: false},
-        );
+      }else if (status==401){
+        //Alert.alert(
+          //"Error",
+          //mensaje,
+          //[
+            //{text: 'OK', 
+            //onPress: () =>  this.refresh()},
+          //],
+          //{cancelable: false},
+        //);
+        console.log('entro en 401')
+        if (peticion==1){
+          this.refresh(1)
+        }else if (peticion==2){
+          this.refresh(2)
+        }else if(peticion==3){
+          this.refresh(3)
+        }
       }else if(status==500){
         Alert.alert(
-          'Error',
+          'Inicio de Sesión',
           mensaje,
           [
-            {text: 'OK', onPress: () => ''},
+            {text: 'OK', onPress: () => 'cerrar'},
           ],
           {cancelable: false},
         );
       }
     }
+    //se vencio la sesión por lo tanto se redirigera a iniciar sesión
     salir=()=>{
       LOCALSTORAGE.borrarSesion()
       this.props.navigation.navigate("Login")
     }
+    borrar=(key:number)=>{
+      let updatedArray = [];
+      for (let el of this.state.alertas) {
+          if (el.key !== key) {
+            updatedArray.push(el);
+          }
+      }
+      this.setState({alertas:updatedArray})
+      console.log(updatedArray)
+    }
+    renderItem= ({item})=> (
+      <ListItem thumbnail >
+        <Left>
+          {item.prioridad == 'BAJA' &&  <Thumbnail style={{}} square source={require('../../assets/priority_low.png')} />}
+          {item.prioridad == 'MEDIA' && <Thumbnail style={{}} square source={require('../../assets/priority_medium.png')} />}
+          {item.prioridad == 'ALTA' && <Thumbnail style={{}} square source={require('../../assets/priority_high.png')} />}
+        </Left>
+        <Body>
+          <Text>{item.titulo}</Text>
+          <Text note numberOfLines={1}>{item.detalle}</Text>
+        </Body>
+        <Right>
+          {item.prioridad == 'BAJA' &&           
+            <Button transparent onPress={()=>this.borrar(item.key)}>
+              <Text>Ignorar</Text>
+            </Button>
+          }
+        </Right>
+      </ListItem>
+      )
     render() {
       return (
         <Container>
           <Content>
-            <List>
-              <ListItem thumbnail >
-                <Left>
-                  <Thumbnail style={{}} square source={require('../../assets/priority_high.png')} />
-                </Left>
-                <Body>
-                  <Text>Prioridad 1</Text>
-                  <Text note numberOfLines={1}>{this.state.token}</Text>
-                </Body>
-                <Right>
-                  <Button transparent>
-                    <Text>Ver</Text>
-                  </Button>
-                </Right>
-              </ListItem>
-              <ListItem thumbnail >
-                <Left>
-                  <Thumbnail style={{}}  square source={require('../../assets/priority_medium.png')} />
-                </Left>
-                <Body>
-                  <Text>Prioridad 2</Text>
-                  <Text note numberOfLines={1}>{this.state.refresh}</Text>
-                </Body>
-                <Right>
-                  <Button transparent>
-                    <Text>Ver</Text>
-                  </Button>
-                </Right>
-              </ListItem>
-              <ListItem thumbnail >
-                <Left>
-                  <Thumbnail style={{}}  square source={require('../../assets/priority_low.png')} />
-                </Left>
-                <Body>
-                  <Text>Prioridad 3</Text>
-                  <Text note numberOfLines={1}>{this.state.macADD}</Text>
-                </Body>
-                <Right>
-                  <Button transparent>
-                    <Text>Ver</Text>
-                  </Button>
-                </Right>
-              </ListItem>
-            </List>
-            <Button onPress={this.peticion}>
-              <Text>Hacer petición</Text>
-            </Button>
+            <View style={styles.viewStyle}>
+                <FlatList
+                  data={this.state.alertas}
+                  //Item Separator View
+                  //enableEmptySections={true}
+                  renderItem={this.renderItem}
+                  style={{ marginTop: 10 }}
+                  keyExtractor={(item:any,index:any) => index.toString()}
+                />
+              </View>
           </Content>
         </Container>
       );
     }
   }
+  const styles = StyleSheet.create({
+    viewStyle: {
+      justifyContent: 'center',
+      flex: 1,
+      backgroundColor: 'white',
+      marginTop: Platform.OS == 'ios' ? 30 : 0,
+    },
+  });
   export default AlertaScreen;

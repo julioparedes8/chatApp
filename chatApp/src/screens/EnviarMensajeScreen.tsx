@@ -147,41 +147,46 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
         console.log(baseResponse.resp.length);
         let users: any[]=[]
         for(var i=0;i<baseResponse.resp.length;i++){
-          //let nombre:String=baseResponse.resp[i].nombre
-          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
-          console.log(baseResponse.resp[i].sysGrupo.listGrupoUsuario.length);
-          for(var j=0;j<baseResponse.resp[i].sysGrupo.listGrupoUsuario.length;j++){
-            if(this.state.id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
+          if(baseResponse.resp[i].sysGrupo.tipo=='MENSAJES'){
+            console.log('si es mensajes');
+            //let nombre:String=baseResponse.resp[i].nombre
+            //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+            console.log(baseResponse.resp[i].sysGrupo.listGrupoUsuario.length);
+            for(var j=0;j<baseResponse.resp[i].sysGrupo.listGrupoUsuario.length;j++){
+              if(this.state.id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
 
-            }else {
-              if(users.length==0){
-                console.log('vale 0');
-                users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
-              }else{
-                let existe=false
-                console.log('length'+users.length);
-                for(var k=0;k<users.length;k++){
-                  console.log('users'+users[k].id+' '+baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id);
-                  if(users[k].id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
-                   existe=false
-                   k=5
-                  }else{
-                    existe=true
-                  }
-                }
-                if(existe==true){
+              }else {
+                if(users.length==0){
+                  console.log('vale 0');
                   users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
-                  console.log('aqui');
+                }else{
+                  let existe=false
+                  console.log('length'+users.length);
+                  for(var k=0;k<users.length;k++){
+                    console.log('users'+users[k].id+' '+baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id);
+                    if(users[k].id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
+                    existe=false
+                    k=5
+                    }else{
+                      existe=true
+                    }
+                  }
+                  if(existe==true){
+                    users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
+                    console.log('aqui');
+                  }
+                  existe=false
                 }
-                existe=false
               }
             }
-          }
-          //if(this.state.id==baseResponse.resp[i].id){
+            //if(this.state.id==baseResponse.resp[i].id){
 
-          //}else {
-           // users.push({"nombre":baseResponse.resp[i].nombre,"imagen":"../../assets/user.png"})
-          //}
+            //}else {
+            // users.push({"nombre":baseResponse.resp[i].nombre,"imagen":"../../assets/user.png"})
+            //}
+          }else{
+
+          }
         }
         console.log(users)
         arrayHolder = users;
@@ -211,46 +216,45 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
         search: text,
       });
     }
+    renderItem=({item}) => (
+      // Single Comes here which will be repeatative for the FlatListItems
+      <ListItem avatar button={true} onPress={this.handleClick}>
+        <Left>
+          <Thumbnail source={require('../../assets/user.png')} />
+        </Left>
+        <Body>
+          <Text style={{position: 'absolute',bottom:25,left:0}}>{item.nombre}</Text>
+          <Text  style={{marginTop:30}}  note></Text>
+        </Body>
+    </ListItem>
+    )
     render(){
           return (
             <Container>
               <Header searchBar style={{backgroundColor:"#70CCF6",height:70}}>
-                  <Left>
+                  <Left style={{flexDirection:'row',flex:1}}>
                     <Button
                         transparent
                         onPress={()=>this.props.navigation.navigate("Home")}
                           >
                         <Icon type="Ionicons" name="ios-arrow-back" />
                     </Button>
-                  </Left>
-                <Body>
-                  <Item>
+                    <Item>
                       <Icon name="ios-search" />
                       <Input  
                         onChangeText={(text:any) => this.SearchFilterFunction(text)}
                         placeholder="Buscar"
                         value={this.state.search}/>
-                      <Icon name="ios-people" />
+                     
                   </Item>
-                </Body>
+                  </Left>
               </Header>
               <Content padder>
               <View style={styles.viewStyle}>
                 <FlatList
                   data={this.state.dataSource}
                   //Item Separator View
-                  renderItem={({ item }) => (
-                    // Single Comes here which will be repeatative for the FlatListItems
-                    <ListItem avatar button={true} onPress={this.handleClick}>
-                      <Left>
-                        <Thumbnail source={require('../../assets/user.png')} />
-                      </Left>
-                      <Body>
-                        <Text style={{position: 'absolute',bottom:25,left:0}}>{item.nombre}</Text>
-                        <Text  style={{marginTop:30}}  note></Text>
-                      </Body>
-                  </ListItem>
-                  )}
+                  renderItem={this.renderItem}
                   //enableEmptySections={true}
                   style={{ marginTop: 10 }}
                   keyExtractor={(item, index) => index.toString()}
@@ -417,5 +421,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginTop: Platform.OS == 'ios' ? 30 : 0,
   },
+  header:{
+    
+  }
 });
 export default EnviarMensajeScreen;
