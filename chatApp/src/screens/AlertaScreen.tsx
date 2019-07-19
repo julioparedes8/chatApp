@@ -8,6 +8,7 @@ import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail } from "native-base";
 import SysAlerta from '../entidades/SysAlerta';
+import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -19,13 +20,16 @@ interface State {
   usuario?:String;
   isAdmin?:String;
   alertas?:any;
+  grupos?:any;
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
 let config={}
 let config2={}
+let config3={}
 let token=""
 let refresh=""
+let alertas: any[]=[]
 class AlertaScreen extends React.Component<Props,State> {
     constructor(props: Props){
       super(props);
@@ -33,7 +37,8 @@ class AlertaScreen extends React.Component<Props,State> {
         token: '',
         refresh:'',
         macADD:'',
-        alertas:[]
+        alertas:[],
+        grupos:[]
       }
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
@@ -49,9 +54,17 @@ class AlertaScreen extends React.Component<Props,State> {
     }
     hacerValidacion(){
       if(this.state.isAdmin=='0'){
-       this.getAlertas()
+        this.getAlertas()
       }else {
-        this.getAlertasXGrupo()
+        this.getGrupoUsuario().then(res=>this.hacerGetXGrupo())
+        //this.getAlertasXGrupo(1)
+      }
+    }
+    hacerGetXGrupo(){
+      alertas=[]
+      console.log('numGrupos:'+this.state.grupos.length)
+      for(var i=0;i<this.state.grupos.length;i++){
+        this.getAlertasXGrupo(this.state.grupos[i].key,this.state.grupos.length)
       }
     }
     upDateToken(){
@@ -119,8 +132,35 @@ class AlertaScreen extends React.Component<Props,State> {
             //carga el estado para despues hacer la peticion del insert
             this.upDateToken().then(res => this.getAlertas());
           } else if(peticion==2){
-            this.upDateToken().then(res => this.getAlertasXGrupo());
+            alertas=[]
+            this.upDateToken().then(res => this.hacerGetXGrupo());
           }
+    }
+    //peticion para sacar los grupos que pertenece un usuario
+    getGrupoUsuario(){
+      return new Promise((resolve, reject) => {
+        config3 = {
+          headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD}
+        }
+        console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
+        API.post('SysGrupoUsuarioRest/getByUsuarioId',this.state.id,config3)
+        .then(response => {
+          const parsedJSON = response;
+          var baseResponse: BaseResponse<SysGrupoUsuario>[] = parsedJSON as BaseResponse<SysGrupoUsuario>[];
+          //console.log(baseResponse.message);
+          //console.log(baseResponse.status);
+          //console.log(baseResponse.usoEnTimbrado);
+          //console.log(baseResponse.resp[0].sysGrupo.nombre);
+          let groups=[]
+          for(var i=0;i<baseResponse.resp.length;i++){
+            groups.push({"key":baseResponse.resp[i].sysGrupo.id,"value":baseResponse.resp[i].sysGrupo.nombre})
+          }
+          this.setState({grupos:groups})
+          console.log(this.state.grupos);
+          resolve();
+        })
+        .catch(error =>this.mensajeShow(error.message,error.status,3))
+      });
     }
     //peticion de alertas cuando es administrador
     getAlertas(){
@@ -138,33 +178,33 @@ class AlertaScreen extends React.Component<Props,State> {
           //let nombre:String=baseResponse.resp[i].nombre
           //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
           if(baseResponse.resp[i].prioridad=='ALTA'){
-            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":1,"fecha":baseResponse.resp[i].fecha})
           }
-        }
-        for(var i=0;i<baseResponse.resp.length;i++){
-          //let nombre:String=baseResponse.resp[i].nombre
-          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
           if(baseResponse.resp[i].prioridad=='MEDIA'){
-            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":2,"fecha":baseResponse.resp[i].fecha})
           }
-        }
-        for(var i=0;i<baseResponse.resp.length;i++){
-          //let nombre:String=baseResponse.resp[i].nombre
-          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
           if(baseResponse.resp[i].prioridad=='BAJA'){
-            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"fecha":baseResponse.resp[i].fecha})
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":3,"fecha":baseResponse.resp[i].fecha})
           }
         }
         console.log(alertas)
+        alertas.sort((a, b) => {
+          if(a.numPriori > b.numPriori) {
+            return 1;
+          } else if(a.numPriori < b.numPriori) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
         //arrayHolder = users;
         this.setState({alertas:alertas})
       })
       .catch(error =>this.mensajeShow(error.message,error.status,1))
     }
     //peticion de alertas cuando no es administrador
-    getAlertasXGrupo(){
-      console.log('token: '+this.state.token +" mac: "+ this.state.macADD+" id: "+this.state.id)
-      API.post('SysGrupoUsuarioRest/getByUsuarioId',this.state.id,config)
+    getAlertasXGrupo(grupo:any,numGrupos:any){
+      API.getAll('SysAlertaRest/getByGrupoId?idGrupo='+grupo,config)
       .then(response => {
         const parsedJSON = response;
         var baseResponse: BaseResponse<SysAlerta>[] = parsedJSON as BaseResponse<SysAlerta>[];
@@ -172,52 +212,36 @@ class AlertaScreen extends React.Component<Props,State> {
         console.log(baseResponse.status);
         console.log(baseResponse.usoEnTimbrado);
         console.log(baseResponse.resp.length);
-        let users: any[]=[]
+        //let alertas: any[]=[]
         for(var i=0;i<baseResponse.resp.length;i++){
-          if(baseResponse.resp[i].sysGrupo.tipo=='MENSAJES'){
-            console.log('si es mensajes');
-            //let nombre:String=baseResponse.resp[i].nombre
-            //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
-            console.log(baseResponse.resp[i].sysGrupo.listGrupoUsuario.length);
-            for(var j=0;j<baseResponse.resp[i].sysGrupo.listGrupoUsuario.length;j++){
-              if(this.state.id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
-
-              }else {
-                if(users.length==0){
-                  console.log('vale 0');
-                  users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
-                }else{
-                  let existe=false
-                  console.log('length'+users.length);
-                  for(var k=0;k<users.length;k++){
-                    console.log('users'+users[k].id+' '+baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id);
-                    if(users[k].id==baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id){
-                    existe=false
-                    k=5
-                    }else{
-                      existe=true
-                    }
-                  }
-                  if(existe==true){
-                    users.push({"id":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.id,"nombre":baseResponse.resp[i].sysGrupo.listGrupoUsuario[j].usuario.nombre,"imagen":"../../assets/user.png"})
-                    console.log('aqui');
-                  }
-                  existe=false
-                }
-              }
-            }
-            //if(this.state.id==baseResponse.resp[i].id){
-
-            //}else {
-            // users.push({"nombre":baseResponse.resp[i].nombre,"imagen":"../../assets/user.png"})
-            //}
-          }else{
-
+          //let nombre:String=baseResponse.resp[i].nombre
+          //let fechaRec:String=baseResponse.resp[i].fechaRecordatorio
+          if(baseResponse.resp[i].prioridad=='ALTA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":1,"fecha":baseResponse.resp[i].fecha})
+          }
+          if(baseResponse.resp[i].prioridad=='MEDIA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":2,"fecha":baseResponse.resp[i].fecha})
+          }
+          if(baseResponse.resp[i].prioridad=='BAJA'){
+            alertas.push({"key":baseResponse.resp[i].id,"titulo":baseResponse.resp[i].titulo,"detalle":baseResponse.resp[i].detalles,"prioridad":baseResponse.resp[i].prioridad,"numPriori":3,"fecha":baseResponse.resp[i].fecha})
           }
         }
-        console.log(users)
+        console.log(alertas)
+        if(numGrupos==this.state.grupos.length){
+          //ordenar arreglo por numPrioridad
+          alertas.sort((a, b) => {
+            if(a.numPriori > b.numPriori) {
+              return 1;
+            } else if(a.numPriori < b.numPriori) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          this.setState({alertas:alertas})
+        }
         //arrayHolder = users;
-        //this.setState({dataSource:users})
+        //this.setState({alertas:alertas})
       })
       .catch(error =>this.mensajeShow(error.message,error.status,2))
     }
@@ -309,9 +333,9 @@ class AlertaScreen extends React.Component<Props,State> {
     renderItem= ({item})=> (
       <ListItem thumbnail >
         <Left>
-          {item.prioridad == 'BAJA' &&  <Thumbnail style={{}} square source={require('../../assets/priority_low.png')} />}
+          {item.prioridad == 'BAJA' &&  <Thumbnail style={{}} square source={require('../../assets/priority_high.png')} />}
           {item.prioridad == 'MEDIA' && <Thumbnail style={{}} square source={require('../../assets/priority_medium.png')} />}
-          {item.prioridad == 'ALTA' && <Thumbnail style={{}} square source={require('../../assets/priority_high.png')} />}
+          {item.prioridad == 'ALTA' && <Thumbnail style={{}} square source={require('../../assets/priority_low.png')} />}
         </Left>
         <Body>
           <Text>{item.titulo}</Text>
