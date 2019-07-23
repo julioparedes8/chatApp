@@ -9,6 +9,8 @@ import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail } from "native-base";
 import SysAlerta from '../entidades/SysAlerta';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
+var SQLite = require('react-native-sqlite-storage')
+let db:any
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -21,6 +23,7 @@ interface State {
   isAdmin?:String;
   alertas?:any;
   grupos?:any;
+  alertasIgnoradas:any
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -38,24 +41,124 @@ class AlertaScreen extends React.Component<Props,State> {
         refresh:'',
         macADD:'',
         alertas:[],
-        grupos:[]
+        grupos:[],
+        alertasIgnoradas:[]
       }
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
         this.setState({macADD:mac})
       });
+       db = SQLite.openDatabase(
+        {
+          name: 'chatApp.db',
+          location: 'default',
+        },
+        () => {console.log('si abrio')},
+        (error:any) => {
+          console.log(error);
+        }
+      );
       this.upDateToken()
     }
-    componentDidMount(){
+    async componentWillMount() {
+      db.transaction((tx: { executeSql: (arg0: string) => void; }) => {
+          tx.executeSql(
+              'create table if not exists alertas (key integer, titulo text,idUsuario integer);'
+          );
+      });
+     // this.setState({ loading: false });
+    }
+    async componentDidMount(){
       //arrayHolder = contactos
         this.upDateToken().then(res => this.hacerValidacion())
       //this.upDateToken().then(res => this.getUsuarios());
       //this.setState({dataSource:contactos})
     }
+    selectAlertas(idUsuario:any) {
+      var query = "select * from alertas where idUsuario="+idUsuario;
+      var query2 = "delete from alertas";
+      var query3= "drop table alertas"
+      db.transaction((tx:any) => {
+        tx.executeSql(query,[], (tx:any, results:any) => {
+          const rows = results.rows;
+          let alertas = [];
+          for (let i = 0; i < rows.length; i++) {
+            alertas.push({
+              ...rows.item(i),
+            });
+          }
+          this.setState({ alertasIgnoradas:alertas });
+          //console.log('AI:'+ this.state.alertasIgnoradas[0].key)
+        });
+      });
+    }
+    insert(key:any, titulo:any,idUsuario:any) {
+      console.log('id'+idUsuario)
+      var query = "INSERT INTO alertas(key,titulo,idUsuario) VALUES (?,?,?)";
+      var params = [key, titulo,idUsuario];
+      db.transaction((tx:any) => {
+          tx.executeSql(query, params, (tx:any, results:any) => {
+              console.log(results);
+              Alert.alert("Success", "Ha sido Guardado Correctamente");
+          }, function (tx:any, err:any) {
+              Alert.alert("Warning", "Vefique que los campos esten llenos");
+              return;
+          });
+      });
+    }
+    revisarTareasIgnoradas(){
+      let updatedArray = [];
+      console.log(this.state.alertas)
+      console.log('longitud'+this.state.alertasIgnoradas.length)
+      if(this.state.alertasIgnoradas.length>0){
+        for (var _i = 0; _i < this.state.alertasIgnoradas.length; _i++) {
+          for (let el of this.state.alertas) {
+            //console.log('entro al for')
+             
+                //console.log('si entro')
+                if(updatedArray.length==0){
+                  console.log('fue 0')
+                  updatedArray.push(el);
+                }else{
+                  let insertarUno:boolean=false
+                  let insertarDos:boolean=false
+                  for (var i = 0; i < updatedArray.length; i++) {
+                    if(el.key==updatedArray[i].key){
+                      insertarUno=true
+                      i=100
+                    }else{
+                      insertarUno=false
+                    }
+                  }
+                  for (var i = 0; i < this.state.alertasIgnoradas.length; i++) {
+                    if(el.key==this.state.alertasIgnoradas[i].key){
+                      insertarDos=true
+                      i=100
+                    }else{
+                      insertarDos=false
+                    }
+                  }
+                  if (insertarDos==false && insertarUno==false){
+                    updatedArray.push(el);
+                  }else{
+                    console.log('se rompio')
+                  }
+                }
+
+          }
+        }
+        this.setState({alertas:updatedArray})
+        console.log(updatedArray)
+      }
+    }
     hacerValidacion(){
       if(this.state.isAdmin=='0'){
+        this.selectAlertas(this.state.id);
+        console.log('ignradas mount:'+this.state.alertasIgnoradas)
         this.getAlertas()
       }else {
+        this.selectAlertas(this.state.id);
+        console.log('ignradas mount:'+this.state.alertasIgnoradas)
         this.getGrupoUsuario().then(res=>this.hacerGetXGrupo())
         //this.getAlertasXGrupo(1)
       }
@@ -199,6 +302,7 @@ class AlertaScreen extends React.Component<Props,State> {
         });
         //arrayHolder = users;
         this.setState({alertas:alertas})
+        this.revisarTareasIgnoradas()
       })
       .catch(error =>this.mensajeShow(error.message,error.status,1))
     }
@@ -239,6 +343,7 @@ class AlertaScreen extends React.Component<Props,State> {
             }
           });
           this.setState({alertas:alertas})
+          this.revisarTareasIgnoradas()
         }
         //arrayHolder = users;
         //this.setState({alertas:alertas})
@@ -325,7 +430,10 @@ class AlertaScreen extends React.Component<Props,State> {
       for (let el of this.state.alertas) {
           if (el.key !== key) {
             updatedArray.push(el);
+          }else{
+            this.insert(el.key,el.titulo,this.state.id)
           }
+          
       }
       this.setState({alertas:updatedArray})
       console.log(updatedArray)

@@ -125,7 +125,7 @@ class CrearTareaScreen extends React.Component<Props,state> {
     render(){
           return (
             <Container>
-              <Header style={{backgroundColor:"#70CCF6",height:70}}>
+              <Header style={{backgroundColor:"#4377C6",height:70}}>
                   <Left style={{ flex:1}}>
                     
                     <Button
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
     margin: 120,
     marginBottom:10, 
     marginTop: 10,
-    backgroundColor:'#70CCF6'
+    backgroundColor:'#4377C6'
   }
 });
 export default CrearTareaScreen;

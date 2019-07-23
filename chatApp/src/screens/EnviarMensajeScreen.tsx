@@ -231,7 +231,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
     render(){
           return (
             <Container>
-              <Header searchBar style={{backgroundColor:"#70CCF6",height:70}}>
+              <Header searchBar style={{backgroundColor:"#4377C6",height:70}}>
                   <Left style={{flexDirection:'row',flex:1}}>
                     <Button
                         transparent
