@@ -6,7 +6,7 @@ import { Login } from '../entidades/Login';
 import localstorage from '../localstorage';
 import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
-import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail } from "native-base";
+import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail, Toast, Spinner } from "native-base";
 import SysAlerta from '../entidades/SysAlerta';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
 var SQLite = require('react-native-sqlite-storage')
@@ -23,7 +23,11 @@ interface State {
   isAdmin?:String;
   alertas?:any;
   grupos?:any;
-  alertasIgnoradas:any
+  alertasIgnoradas:any;
+  key:any;
+  titulo:any;
+  idUsuario:any;
+  cargando:Boolean
 }
 let API = new api();
 let LOCALSTORAGE = new localstorage();
@@ -42,7 +46,11 @@ class AlertaScreen extends React.Component<Props,State> {
         macADD:'',
         alertas:[],
         grupos:[],
-        alertasIgnoradas:[]
+        alertasIgnoradas:[],
+        key:'',
+        titulo:'',
+        idUsuario:'',
+        cargando: false
       }
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
@@ -70,6 +78,7 @@ class AlertaScreen extends React.Component<Props,State> {
     }
     async componentDidMount(){
       //arrayHolder = contactos
+      this.setState({cargando:false})
         this.upDateToken().then(res => this.hacerValidacion())
       //this.upDateToken().then(res => this.getUsuarios());
       //this.setState({dataSource:contactos})
@@ -92,16 +101,51 @@ class AlertaScreen extends React.Component<Props,State> {
         });
       });
     }
+    delete(reason:any) {
+      console.log('reason'+reason)
+      if(reason=='user'){
+        console.log(reason)
+        var query = "Delete from alertas where key="+this.state.key+" AND titulo='"+this.state.titulo+"' AND idUsuario="+this.state.idUsuario;
+        console.log(query);
+        //var params = [key, titulo,idUsuario];
+        db.transaction((tx:any) => {
+            tx.executeSql(query, [], (tx:any, results:any) => {
+                console.log('se elimino');
+               // Alert.alert("Alerta","No se ignoro la alerta")
+            }, function (tx:any, err:any) {
+                Alert.alert("Error",err)
+                return;
+            });
+        });
+        this.setState({titulo:'',key:'',idUsuario:''})
+      }else{
+        this.borrar(this.state.key)
+        this.setState({titulo:'',key:'',idUsuario:''})
+      }
+      
+    }
     insert(key:any, titulo:any,idUsuario:any) {
       console.log('id'+idUsuario)
       var query = "INSERT INTO alertas(key,titulo,idUsuario) VALUES (?,?,?)";
       var params = [key, titulo,idUsuario];
+      this.setState({titulo:titulo,key:key,idUsuario:idUsuario})
+      console.log('datos'+this.state.titulo+this.state.idUsuario+this.state.key)
       db.transaction((tx:any) => {
           tx.executeSql(query, params, (tx:any, results:any) => {
               console.log(results);
-              Alert.alert("Success", "Ha sido Guardado Correctamente");
+              Toast.show({
+                text: 'Se ignoro con éxito',
+                buttonText: 'Deshacer',
+                duration:3000,
+                onClose:this.delete.bind(this),
+                position:'bottom',
+                type:'success',
+                buttonStyle:{
+                  height:50
+                }
+              })
           }, function (tx:any, err:any) {
-              Alert.alert("Warning", "Vefique que los campos esten llenos");
+              Alert.alert("Error", "Vefique que los campos esten llenos");
               return;
           });
       });
@@ -150,6 +194,7 @@ class AlertaScreen extends React.Component<Props,State> {
         this.setState({alertas:updatedArray})
         console.log(updatedArray)
       }
+      this.setState({cargando:true})
     }
     hacerValidacion(){
       if(this.state.isAdmin=='0'){
@@ -237,6 +282,9 @@ class AlertaScreen extends React.Component<Props,State> {
           } else if(peticion==2){
             alertas=[]
             this.upDateToken().then(res => this.hacerGetXGrupo());
+          }
+          else if(peticion==3){
+            this.getGrupoUsuario().then(res=>this.hacerGetXGrupo())
           }
     }
     //peticion para sacar los grupos que pertenece un usuario
@@ -431,11 +479,12 @@ class AlertaScreen extends React.Component<Props,State> {
           if (el.key !== key) {
             updatedArray.push(el);
           }else{
-            this.insert(el.key,el.titulo,this.state.id)
+            //this.insert(el.key,el.titulo,this.state.id)
           }
           
       }
       this.setState({alertas:updatedArray})
+
       console.log(updatedArray)
     }
     renderItem= ({item})=> (
@@ -451,7 +500,7 @@ class AlertaScreen extends React.Component<Props,State> {
         </Body>
         <Right>
           {item.prioridad == 'BAJA' &&           
-            <Button transparent onPress={()=>this.borrar(item.key)}>
+            <Button transparent onPress={()=>this.insert(item.key,item.titulo,this.state.id)}>
               <Text>Ignorar</Text>
             </Button>
           }
@@ -459,22 +508,33 @@ class AlertaScreen extends React.Component<Props,State> {
       </ListItem>
       )
     render() {
-      return (
-        <Container>
-          <Content>
-            <View style={styles.viewStyle}>
-                <FlatList
-                  data={this.state.alertas}
-                  //Item Separator View
-                  //enableEmptySections={true}
-                  renderItem={this.renderItem}
-                  style={{ marginTop: 10 }}
-                  keyExtractor={(item:any,index:any) => index.toString()}
-                />
-              </View>
-          </Content>
-        </Container>
-      );
+      if (this.state.cargando==false) {
+        return (
+          <Container style={styles.container}>
+            <Content  contentContainerStyle={styles.spinnerStyle}>
+              <Spinner color='blue' />
+                    <Text>Cargando...</Text>
+            </Content>
+          </Container>
+        );
+      }else{
+        return (
+          <Container>
+            <Content>
+              <View style={styles.viewStyle}>
+                  <FlatList
+                    data={this.state.alertas}
+                    //Item Separator View
+                    //enableEmptySections={true}
+                    renderItem={this.renderItem}
+                    style={{ marginTop: 10 }}
+                    keyExtractor={(item:any,index:any) => index.toString()}
+                  />
+                </View>
+            </Content>
+          </Container>
+        );
+      }
     }
   }
   const styles = StyleSheet.create({
@@ -483,6 +543,15 @@ class AlertaScreen extends React.Component<Props,State> {
       flex: 1,
       backgroundColor: 'white',
       marginTop: Platform.OS == 'ios' ? 30 : 0,
+    },
+    spinnerStyle: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    container: {
+      flex: 1,
+      // backgroundColor: '#4286f4',
     },
   });
   export default AlertaScreen;

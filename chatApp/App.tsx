@@ -13,9 +13,9 @@ import {Platform, StyleSheet, Text, View} from 'react-native';
 import HomeScreen from './src/screens/MessagesScreen'
 //import DrawerNavigator from './src/navigation/DrawerNavigator'
 import MainNavigator from './src/navigation/MainNavigator';
-import FooterComponent from './src/components/Footer';
 
 interface Props {}
+console.disableYellowBox = true; 
 export default class App extends Component<Props> {
   render() {
     return (

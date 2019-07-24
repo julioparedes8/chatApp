@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Header, Content, Form, Item, Input, Button,Left,Icon,Body,Right,Title,Text, ListItem, Thumbnail, List } from 'native-base';
+import { Container, Header, Content, Form, Item, Input, Button,Left,Icon,Body,Right,Title,Text, ListItem, Thumbnail, List, Spinner } from 'native-base';
 import {View,StyleSheet,FlatList, AsyncStorage, Platform, Alert} from 'react-native'
 import api from '../api';
 import localstorage from '../localstorage';
@@ -22,6 +22,7 @@ interface state{
   usuario?:String;
   isAdmin?:String;
   contacts?:any;
+  cargando:Boolean;
   //creacionTime?: string;
 }
 let API = new api();
@@ -82,7 +83,7 @@ let contactos=[
 class EnviarMensajeScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
-      this.state = { search: '',dataSource:[],contacts:[]};
+      this.state = { search: '',dataSource:[],contacts:[],cargando:false};
       arrayHolder = [];
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
@@ -98,6 +99,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
     }
     componentDidMount(){
       //arrayHolder = contactos
+      this.setState({cargando:false})
         this.upDateToken().then(res => this.hacerValidacion())
       //this.upDateToken().then(res => this.getUsuarios());
       //this.setState({dataSource:contactos})
@@ -132,6 +134,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
         console.log(users)
         arrayHolder = users;
         this.setState({dataSource:users})
+        this.setState({cargando:true})
       })
       .catch(error =>this.mensajeShow(error.message,error.status,1))
     }
@@ -191,6 +194,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
         console.log(users)
         arrayHolder = users;
         this.setState({dataSource:users})
+        this.setState({cargando:true})
       })
       .catch(error =>this.mensajeShow(error.message,error.status,2))
     }
@@ -229,6 +233,35 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
     </ListItem>
     )
     render(){
+      if (this.state.cargando==false) {
+        return (
+          <Container>
+              <Header searchBar style={{backgroundColor:"#4377C6",height:70}}>
+                  <Left style={{flexDirection:'row',flex:1}}>
+                    <Button
+                        transparent
+                        onPress={()=>this.props.navigation.navigate("Home")}
+                          >
+                        <Icon type="Ionicons" name="ios-arrow-back" />
+                    </Button>
+                    <Item>
+                      <Icon name="ios-search" />
+                      <Input  
+                        onChangeText={(text:any) => this.SearchFilterFunction(text)}
+                        placeholder="Buscar"
+                        value={this.state.search}/>
+                     
+                  </Item>
+                  </Left>
+              </Header>
+              <Content  contentContainerStyle={styles.spinnerStyle}>
+                    <Spinner color='blue' />
+                    <Text>Cargando...</Text>
+                </Content>
+            </Container>
+
+        );
+      }else{
           return (
             <Container>
               <Header searchBar style={{backgroundColor:"#4377C6",height:70}}>
@@ -264,6 +297,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
               </Content>
             </Container>
           )
+      }
     }
     upDateToken(){
       return new Promise((resolve, reject) => {
@@ -423,6 +457,15 @@ const styles = StyleSheet.create({
   },
   header:{
     
-  }
+  },
+  spinnerStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#4286f4',
+  },
 });
 export default EnviarMensajeScreen;
