@@ -90,9 +90,9 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
         this.setState({macADD:mac})
       });
     }
-    handleClick=()=>{
-      const {navigate}= this.props.navigation
-      navigate('Chat')
+    handleClick=(id:any,nombre:any)=>{
+      console.log(this.state.id+' '+id+' '+nombre)
+      this.props.navigation.push("Chat",{idUsuario:this.state.id,idDestinatario:id,nomDestinatario:nombre})
       //this.props.navigation.navigate("Login")
       // Call method from parent
       //this.props.onPress();
@@ -128,7 +128,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
           if(this.state.id==baseResponse.resp[i].id){
 
           }else {
-            users.push({"nombre":baseResponse.resp[i].nombre,"imagen":"../../assets/user.png"})
+            users.push({"nombre":baseResponse.resp[i].nombre,"id":baseResponse.resp[i].id,"imagen":"../../assets/user.png"})
           }
         }
         console.log(users)
@@ -222,7 +222,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
     }
     renderItem=({item}) => (
       // Single Comes here which will be repeatative for the FlatListItems
-      <ListItem avatar button={true} onPress={this.handleClick}>
+      <ListItem avatar button={true} onPress={() => this.handleClick(item.id,item.nombre)}>
         <Left>
           <Thumbnail source={require('../../assets/user.png')} />
         </Left>

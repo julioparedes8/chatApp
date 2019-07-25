@@ -10,6 +10,9 @@ import Usuario from '../entidades/Usuario'
 import DeviceInfo from 'react-native-device-info';
 import { BaseResponse } from '../entidades/BaseResponse';
 import LocalStorage from '../localstorage';
+import { ClientRequest } from 'http';
+//import * as StopmWS from 'react-native-stomp-websocket';
+//const StompWS = require("react-native-stomp-websocket").default
 export interface Props{
     navigation: NavigationScreenProp<any,any>
 }
@@ -20,6 +23,7 @@ interface state{
     password?: string;
     modal?: boolean;
     macADD?:String;
+    pcName?:String;
 }
 //definimos variables globales
 let API = new api();
@@ -29,6 +33,7 @@ let refresh=""
 let id="";
 let usuario="";
 let isAdmin:String=''
+//const client = StompWS.client('ws://10.10.1.82:8008/connect');
 class LoginScreen extends React.Component<Props,state> {
   constructor(props: Readonly<Props>){
     super(props);
@@ -38,15 +43,20 @@ class LoginScreen extends React.Component<Props,state> {
       password:'',
       modal:false,
       macADD:'',
+      pcName:''
     }
     this.obtenerMac()
   }
+  
   //obtiene la macAddress
   obtenerMac(){
     DeviceInfo.getMACAddress().then(mac => {
       // "E5:12:D8:E5:69:97"
       this.setState({macADD:mac})
     });
+    const deviceName = DeviceInfo.getDeviceId();
+    this.setState({pcName: deviceName})
+    console.log('Nombre: '+deviceName)
   }
   //sirve para ocultar y mostrar el texto de la contraseña
   ocultarPress = () =>{
@@ -64,7 +74,7 @@ class LoginScreen extends React.Component<Props,state> {
       this.mensajeShow("Ingrese contraseña",1)
     }else {
       let config = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json','MacAddress':this.state.macADD,'codigo':this.state.usuario,'password':md5(String(this.state.password))}
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','MacAddress':this.state.macADD,'pid':1,'pcName':this.state.pcName,'codigo':this.state.usuario,'password':md5(String(this.state.password))}
       }
       //hacemos la petición pasando como referencia el tipo de sesión y la confiracion
       API.sesion('login',config)
@@ -139,7 +149,8 @@ class LoginScreen extends React.Component<Props,state> {
   }
   //aqui se almacena los tokens en el LS ya que el login fue correcto y te navega a la pantalla principal
   loginCorrecto=()=>{
-    //console.log('subtr '+token.substr(1,token.length-1))
+    
+
     LOCALSTORAGE.setToken(token)
     LOCALSTORAGE.setIdUsuario(id.toString())
     LOCALSTORAGE.setUsuario(usuario.toString())

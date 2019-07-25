@@ -3,6 +3,7 @@ package com.chatapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cc.creamcookie.stompws.RNStompWSPackage;
 import org.pgsqlite.SQLitePluginPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNStompWSPackage(),
             new SQLitePluginPackage(),
             new RNDeviceInfo(),
             new AsyncStoragePackage(),
