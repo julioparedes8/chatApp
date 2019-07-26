@@ -92,7 +92,9 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
     }
     handleClick=(id:any,nombre:any)=>{
       console.log(this.state.id+' '+id+' '+nombre)
-      this.props.navigation.push("Chat",{idUsuario:this.state.id,idDestinatario:id,nomDestinatario:nombre})
+      let ide:number
+      ide=Number(this.state.id) // 1234
+      this.props.navigation.push("Chat",{idUsuario:ide,idDestinatario:id,nomDestinatario:nombre})
       //this.props.navigation.navigate("Login")
       // Call method from parent
       //this.props.onPress();

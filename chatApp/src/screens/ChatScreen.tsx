@@ -10,16 +10,16 @@ const StompWS = require("react-native-stomp-websocket").default
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
-interface User {
-    _id: number;
-    name: string;
-    avatar: string; 
-}
+//interface User {
+    //_id: number;
+    //name: string;
+    //avatar: string; 
+//}
 interface Messages {
     _id: number;
     text: string;
     createdAt: Date;
-    user:User;
+    //user:User;
 }
 interface state{
   messages?:Messages[];
@@ -32,10 +32,15 @@ interface state{
 let API = new api();
 let LOCALSTORAGE = new localstorage();
 let idUsuario:string
-let config={}
+let config:any
 let idDestinatario:string
 let nomDestintario:string
-const client = StompWS.client('ws://10.10.1.82:8008/connect');
+var subscription:any;
+const client = StompWS.client('ws://10.10.1.82:8008');
+client.debug = function(str:any) {
+  // append the debug log to a #debug div
+  console.log(str)
+}
 class ChatScreen extends React.Component<Props,state> {
     constructor(props: Props){
       super(props);
@@ -52,31 +57,24 @@ class ChatScreen extends React.Component<Props,state> {
       });
       this.upDateToken().then(res => this.hacerConexion())
     }
-    hacerConexion(){
-      let config = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-      }
-      console.log(config);
-      client.connect(config.headers.tenantId,config.headers.MacAddress,config.headers.Authorization, this.connectCallback, this.errorCallback);
-    }
     connectCallback () {
       // called back after the client is connected and authenticated to the STOMP server
       console.log('ya se conectó');
-      var callback = function (message:any) {
-        // called when the client receives a STOMP message from the server
-        console.log('Se recibio un '+message);
-        if (message.body) {
-          Alert.alert("got message with body " + message.body)
-        } else
-        {
-          Alert.alert("got empty message");
-        }
-      };
-      client.subscribe('/topic/chat/1',callback)
+      subscription = client.subscribe('/chat/'+idUsuario,this.callBack)
+    }
+    callBack(message:any) {
+      // called when the client receives a STOMP message from the server
+      console.log("mensaje " + message)
+      if (message.body) {
+        Alert.alert("got message with body " + message.body)
+      } else
+      {
+        Alert.alert("got empty message");
+      }
     }
     errorCallback(error:any) {
       // display the error's message header:
-      console.log('Error'+ error);
+      console.log(error);
     }
     upDateToken(){
       return new Promise((resolve, reject) => {
@@ -90,6 +88,13 @@ class ChatScreen extends React.Component<Props,state> {
         })
       });
     }
+    hacerConexion(){
+      config = {
+        headers: { 'tenantId':'macropro','authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
+      }
+      console.log(config);
+      client.connect('/connect',config.headers.tenantId,config.headers.MacAddress,config.headers.authorization, this.connectCallback, this.errorCallback);
+    }
     componentWillMount() {
       this.setState({
         messages: [
@@ -97,41 +102,45 @@ class ChatScreen extends React.Component<Props,state> {
             _id: 1,
             text: "Como estas?",
             createdAt: new Date(),
-            user: {
-              _id: 2,
-              name: "React Native",
-              avatar: "https://placeimg.com/140/140/any"
-            }
+            //user: {
+             // _//id: 2,
+              //name: "React Native",
+              ///avatar: "https://placeimg.com/140/140/any"
+           // }
           },
           {
-            _id: 2,
-            text: "Hello developer",
+          _id: 2,
+           text: "Hello developer",
             createdAt: new Date(),
-            user: {
-              _id: 2,
-              name: "React Native",
-              avatar: "https://placeimg.com/140/140/any"
-            }
+            //user: {
+             // _//id: 2,
+              //name: "React Native",
+              //avatar: "https://placeimg.com/140/140/any"
+            //}
           },
         ]
       })
     }
-    onSend=(messages = [])=> {
-      this.setState(previousState => {
+    onSend=(messages:any = [])=> {
+      this.enviarMensaje(messages[0].text)
+      this.setState(prevState => {
         return ({
-          messages: GiftedChat.append(previousState.messages, messages)
+          messages: GiftedChat.append(prevState.messages, messages)
         });
       });
     }
     enviarMensaje(messages:any){
+      console.log(messages)
       config = {
-        headers: { 'tenantId':'macropro','Content-Type': 'application/json', 'idRemitente': idUsuario,'idDestinatario': idDestinatario,'MacAddress':this.state.macADD }
+        headers: { 'tenantId':'macropro','Content-Type': 'application/json','Authorization': 'Bearer '+this.state.token, 'idRemitente': idUsuario,'idDestinatario': idDestinatario,'MacAddress':this.state.macADD }
       }
       var data={
         "idRemitente": idUsuario,
         "idDestinatario": idDestinatario,
         "contenido": messages
       }
+      console.log(config)
+      console.log(data)
       API.post('SysMensajeRest/enviar',data,config)
           .then(response => {
             const parsedJSON = response;
@@ -144,7 +153,69 @@ class ChatScreen extends React.Component<Props,state> {
               //this.mensajeShow("Asunto: "+baseResponse.resp.asunto,baseResponse.status)
             //}
           })
-        .catch(error => 'this.mensajeShow(error.message,error.status,1')
+        .catch(error =>   this.mensajeShow(error.message,error.status,1))
+    }
+    //muestra mensajes/alertas dependiendo de status ya sea de peticion o de validacion
+    mensajeShow = (mensaje:any,status:any,peticion?:any)=>{
+      if (status==1){
+        Alert.alert(
+          "Error de validación",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => ""},
+          ],
+          {cancelable: false},
+        );
+      } else if (status==200){
+        Alert.alert(
+          "Tarea agregada exitosamente",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () => 'this.limpiar()'},
+          ],
+          {cancelable: false},
+        );
+      }else if(status==300){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==400){
+        Alert.alert(
+          "Error",
+          mensaje,
+          [
+            {text: 'OK', 
+            onPress: () =>'this.salir()'},
+          ],
+          {cancelable: false},
+        );
+      }else if (status==401){
+        //Alert.alert(
+          //"Error",
+          //mensaje,
+          //[
+            //{text: 'OK', 
+            //onPress: () =>  this.refresh()},
+          //],
+          //{cancelable: false},
+        //);
+      }else if(status==500){
+        Alert.alert(
+          'Inicio de Sesión',
+          mensaje,
+          [
+            {text: 'OK', onPress: () => 'cerrar'},
+          ],
+          {cancelable: false},
+        );
+      }
     }
     render(){
           return (
@@ -170,9 +241,6 @@ class ChatScreen extends React.Component<Props,state> {
                 <GiftedChat
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
-                    user={{
-                      _id: 1
-                    }}
                 />
                 
             </Container>
