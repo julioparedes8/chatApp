@@ -84,7 +84,7 @@ class HomeScreen extends React.Component<Props,State> {
     }           
     return (
       <Container>
-        <Header style={{backgroundColor:"#4377C6",height:70}}>
+        <Header style={{backgroundColor:"#142851",height:70}}>
         <Left style={{ flex:1}}>
             {this.state.index==3 && 
               <Button
@@ -118,7 +118,7 @@ class HomeScreen extends React.Component<Props,State> {
           <AppComponent navigation={this.props.navigation}/>
         </Content>
         <Footer style={{height:70}}>
-          <FooterTab style={{backgroundColor:"#4377C6",height:70}}>
+          <FooterTab style={{backgroundColor:"#142851",height:70}}>
             <Button style={{height:70}} vertical onPress={() => this.switchScreen(1) } active={this.state.index === 1}>
               <Icon type='Feather' name="alert-triangle" style={{color:"white"}}/>
               <Text style={{color:"white"}}>Alertas</Text>

@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   button:{
     margin: 60, 
     marginTop: 50,
-    backgroundColor:'#4377C6'
+    backgroundColor:'#142851'
   },
   txtLogin:{
     position: 'absolute',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     fontFamily:'Cochin',
     fontSize: 36,
     fontWeight: 'bold',
-    color:'#4377C6'
+    color:'#142851'
 
   }
 });

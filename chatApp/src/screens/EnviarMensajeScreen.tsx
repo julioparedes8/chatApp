@@ -238,7 +238,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
       if (this.state.cargando==false) {
         return (
           <Container>
-              <Header searchBar style={{backgroundColor:"#4377C6",height:70}}>
+              <Header searchBar style={{backgroundColor:"#142851",height:70}}>
                   <Left style={{flexDirection:'row',flex:1}}>
                     <Button
                         transparent
@@ -266,7 +266,7 @@ class EnviarMensajeScreen extends React.Component<Props,state> {
       }else{
           return (
             <Container>
-              <Header searchBar style={{backgroundColor:"#4377C6",height:70}}>
+              <Header searchBar style={{backgroundColor:"#142851",height:70}}>
                   <Left style={{flexDirection:'row',flex:1}}>
                     <Button
                         transparent

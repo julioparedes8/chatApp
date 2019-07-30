@@ -6,7 +6,9 @@ import localstorage from '../localstorage';
 import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
-const StompWS = require("react-native-stomp-websocket").default
+import SockJS from 'sockjs-client';
+//import Stomp from "@stomp/stompjs"
+import Stomp from 'stompjs'
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -22,7 +24,7 @@ interface Messages {
     //user:User;
 }
 interface state{
-  messages?:Messages[];
+  messages?:any[];
   idUsuario:any,
   idDestinatario:any,
   nomDestintario:any,
@@ -35,15 +37,13 @@ let idUsuario:string
 let config:any
 let idDestinatario:string
 let nomDestintario:string
+let id:any=0
 var subscription:any;
-const client = StompWS.client('ws://10.10.1.82:8008');
-client.debug = function(str:any) {
-  // append the debug log to a #debug div
-  console.log(str)
-}
 class ChatScreen extends React.Component<Props,state> {
+  private stompClient:any;
     constructor(props: Props){
       super(props);
+      id=0
       idUsuario = this.props.navigation.getParam('idUsuario');
       idDestinatario = this.props.navigation.getParam('idDestinatario');
       nomDestintario = this.props.navigation.getParam('nomDestinatario');
@@ -57,25 +57,7 @@ class ChatScreen extends React.Component<Props,state> {
       });
       this.upDateToken().then(res => this.hacerConexion())
     }
-    connectCallback () {
-      // called back after the client is connected and authenticated to the STOMP server
-      console.log('ya se conectó');
-      subscription = client.subscribe('/chat/'+idUsuario,this.callBack)
-    }
-    callBack(message:any) {
-      // called when the client receives a STOMP message from the server
-      console.log("mensaje " + message)
-      if (message.body) {
-        Alert.alert("got message with body " + message.body)
-      } else
-      {
-        Alert.alert("got empty message");
-      }
-    }
-    errorCallback(error:any) {
-      // display the error's message header:
-      console.log(error);
-    }
+  
     upDateToken(){
       return new Promise((resolve, reject) => {
         LOCALSTORAGE.getToken().then(response=>{
@@ -93,33 +75,28 @@ class ChatScreen extends React.Component<Props,state> {
         headers: { 'tenantId':'macropro','authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
       }
       console.log(config);
-      client.connect('/connect',config.headers.tenantId,config.headers.MacAddress,config.headers.authorization, this.connectCallback, this.errorCallback);
+      var socket = new SockJS('http://192.168.1.105:8008/connect');
+      id=1
+      //this.stompClient = Stomp.Stomp.client(socket);
+      this.stompClient = Stomp.over(socket)
+      const _this = this;
+      this.stompClient.connect({}, function (frame:any) {
+        _this.stompClient.subscribe('/topic/chat/'+idUsuario, function (hello:any) {
+          console.log('id= '+id);
+          const incomingMessage:any = {
+            _id:id,
+            text: (JSON.parse(hello.body).contenido),
+            createdAt: new Date()
+          }
+          _this.setState(previousState => ({
+            messages: GiftedChat.append(previousState.messages, incomingMessage),
+          }));
+          id++
+        // _this.showGreeting(JSON.parse(hello.body).greeting);
+        });
+      });
     }
     componentWillMount() {
-      this.setState({
-        messages: [
-          {
-            _id: 1,
-            text: "Como estas?",
-            createdAt: new Date(),
-            //user: {
-             // _//id: 2,
-              //name: "React Native",
-              ///avatar: "https://placeimg.com/140/140/any"
-           // }
-          },
-          {
-          _id: 2,
-           text: "Hello developer",
-            createdAt: new Date(),
-            //user: {
-             // _//id: 2,
-              //name: "React Native",
-              //avatar: "https://placeimg.com/140/140/any"
-            //}
-          },
-        ]
-      })
     }
     onSend=(messages:any = [])=> {
       this.enviarMensaje(messages[0].text)
@@ -220,7 +197,7 @@ class ChatScreen extends React.Component<Props,state> {
     render(){
           return (
             <Container>
-              <Header style={{backgroundColor:"#4377C6",height:70}}>
+              <Header style={{backgroundColor:"#142851",height:70}}>
                 <Left style={{ flex:1}}>
                     
                       <Button
@@ -232,7 +209,7 @@ class ChatScreen extends React.Component<Props,state> {
                     
                   </Left>
                   <Body style={{ flex:1}}>
-                    <Text  style={{ alignSelf: 'center'}}>{this.state.nomDestintario}</Text>
+                    <Text  style={{ alignSelf: 'center',color:'white'}}>{this.state.nomDestintario}</Text>
                   </Body>
                   <Right style={{ flex:1}}>
                   

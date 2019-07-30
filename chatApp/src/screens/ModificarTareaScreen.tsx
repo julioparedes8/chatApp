@@ -133,7 +133,7 @@ class ModificarTareaScreen extends React.Component<Props,state> {
     render(){
           return (
             <Container>
-              <Header style={{backgroundColor:"#4377C6",height:70}}>
+              <Header style={{backgroundColor:"#142851",height:70}}>
                   <Left style={{ flex:1}}>
                     
                     <Button
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
     margin: 120,
     marginBottom:10, 
     marginTop: 10,
-    backgroundColor:'#4377C6'
+    backgroundColor:'#142851'
   }
 });
 export default ModificarTareaScreen;
