@@ -84,20 +84,23 @@ class AlertaScreen extends React.Component<Props,State> {
       //this.setState({dataSource:contactos})
     }
     selectAlertas(idUsuario:any) {
-      var query = "select * from alertas where idUsuario="+idUsuario;
-      var query2 = "delete from alertas";
-      var query3= "drop table alertas"
-      db.transaction((tx:any) => {
-        tx.executeSql(query,[], (tx:any, results:any) => {
-          const rows = results.rows;
-          let alertas = [];
-          for (let i = 0; i < rows.length; i++) {
-            alertas.push({
-              ...rows.item(i),
-            });
-          }
-          this.setState({ alertasIgnoradas:alertas });
-          //console.log('AI:'+ this.state.alertasIgnoradas[0].key)
+      return new Promise((resolve, reject) => {
+        var query = "select * from alertas where idUsuario="+idUsuario;
+        var query2 = "delete from alertas";
+        var query3= "drop table alertas"
+        db.transaction((tx:any) => {
+          tx.executeSql(query,[], (tx:any, results:any) => {
+            const rows = results.rows;
+            let alertas = [];
+            for (let i = 0; i < rows.length; i++) {
+              alertas.push({
+                ...rows.item(i),
+              });
+            }
+            this.setState({ alertasIgnoradas:alertas });
+            resolve()
+            //console.log('AI:'+ this.state.alertasIgnoradas[0].key)
+          });
         });
       });
     }
@@ -198,12 +201,11 @@ class AlertaScreen extends React.Component<Props,State> {
     }
     hacerValidacion(){
       if(this.state.isAdmin=='0'){
-        this.selectAlertas(this.state.id);
-        console.log('ignradas mount:'+this.state.alertasIgnoradas)
-        this.getAlertas()
+        this.selectAlertas(this.state.id).then(res => this.getAlertas())
+        //console.log('ignradas mount:'+this.state.alertasIgnoradas)
       }else {
         this.selectAlertas(this.state.id);
-        console.log('ignradas mount:'+this.state.alertasIgnoradas)
+        //console.log('ignradas mount:'+this.state.alertasIgnoradas)
         this.getGrupoUsuario().then(res=>this.hacerGetXGrupo())
         //this.getAlertasXGrupo(1)
       }

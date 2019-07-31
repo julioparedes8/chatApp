@@ -6,9 +6,7 @@ import localstorage from '../localstorage';
 import DeviceInfo from 'react-native-device-info';
 import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header,List,ListItem,Thumbnail, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
-import SockJS from 'sockjs-client';
-//import Stomp from "@stomp/stompjs"
-import Stomp from 'stompjs'
+import SessionWebSocket from '../SessionWebSocket';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
   };
@@ -37,13 +35,11 @@ let idUsuario:string
 let config:any
 let idDestinatario:string
 let nomDestintario:string
-let id:any=0
-var subscription:any;
+let webSocket = SessionWebSocket.getInstance()
 class ChatScreen extends React.Component<Props,state> {
   private stompClient:any;
     constructor(props: Props){
       super(props);
-      id=0
       idUsuario = this.props.navigation.getParam('idUsuario');
       idDestinatario = this.props.navigation.getParam('idDestinatario');
       nomDestintario = this.props.navigation.getParam('nomDestinatario');
@@ -55,7 +51,7 @@ class ChatScreen extends React.Component<Props,state> {
         // "E5:12:D8:E5:69:97"
         this.setState({macADD:mac})
       });
-      this.upDateToken().then(res => this.hacerConexion())
+      this.upDateToken().then(res => this.hacerSubscripcion())
     }
   
     upDateToken(){
@@ -70,31 +66,14 @@ class ChatScreen extends React.Component<Props,state> {
         })
       });
     }
-    hacerConexion(){
-      config = {
-        headers: { 'tenantId':'macropro','authorization': 'Bearer '+this.state.token,'MacAddress':this.state.macADD }
-      }
-      console.log(config);
-      var socket = new SockJS('http://192.168.1.105:8008/connect');
-      id=1
-      //this.stompClient = Stomp.Stomp.client(socket);
-      this.stompClient = Stomp.over(socket)
-      const _this = this;
-      this.stompClient.connect({}, function (frame:any) {
-        _this.stompClient.subscribe('/topic/chat/'+idUsuario, function (hello:any) {
-          console.log('id= '+id);
-          const incomingMessage:any = {
-            _id:id,
-            text: (JSON.parse(hello.body).contenido),
-            createdAt: new Date()
-          }
-          _this.setState(previousState => ({
-            messages: GiftedChat.append(previousState.messages, incomingMessage),
-          }));
-          id++
-        // _this.showGreeting(JSON.parse(hello.body).greeting);
-        });
-      });
+    hacerSubscripcion(){
+      webSocket.unSubscribe('sub-0')
+      webSocket.subscribe('/topic/chat/1').then((res:any)=>{
+        console.log(res)
+        this.setState(previousState => ({
+          messages: GiftedChat.append(previousState.messages, res),
+        }));
+      })
     }
     componentWillMount() {
     }
@@ -202,7 +181,9 @@ class ChatScreen extends React.Component<Props,state> {
                     
                       <Button
                         transparent
-                        onPress={()=>this.props.navigation.push("Home")}
+                        onPress={()=>
+                          this.props.navigation.push('Home')
+                        }
                           >
                         <Icon type="Ionicons" name="ios-arrow-back" />
                       </Button>

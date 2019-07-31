@@ -149,14 +149,12 @@ class LoginScreen extends React.Component<Props,state> {
   }
   //aqui se almacena los tokens en el LS ya que el login fue correcto y te navega a la pantalla principal
   loginCorrecto=()=>{
-    
-
     LOCALSTORAGE.setToken(token)
     LOCALSTORAGE.setIdUsuario(id.toString())
     LOCALSTORAGE.setUsuario(usuario.toString())
     LOCALSTORAGE.setRefresh(refresh)
     LOCALSTORAGE.setIsAdmin(isAdmin.toString())
-    this.props.navigation.navigate("Home",{index:3})
+    this.props.navigation.push("Home",{index:3,idUsuario:id.toString()})
   }
   getUsuario(){
     console.log("entro");

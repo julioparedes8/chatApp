@@ -8,27 +8,54 @@ import MessagesScreen from './MessagesScreen';
 import AlertaScreen from './AlertaScreen';
 import AvisoScreen from './AvisoScreen';
 import AgendaScreen from './AgendaScreen';
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions,StackActions } from 'react-navigation'
+import SessionWebSocket from '../SessionWebSocket';
 export interface Props {
   navigation: NavigationScreenProp<any,any>,
 };
 interface State{
-  index?: number
+  index?: number,
+  idUsuario?:String
 }
 //variables globales
 let API = new api();
 let LOCALSTORAGE = new localstorage();
+let webSocket = SessionWebSocket.getInstance()
 class HomeScreen extends React.Component<Props,State> {
   constructor(props: Props){
     super(props);
     const indice = this.props.navigation.getParam('index');
-    console.log('indice render'+indice)
       // el indice para la pantalla de inicio
     if(indice==undefined){
       this.state = {index: 3}
     }else{
       this.state = {index: indice}
     }
+  }
+  componentDidMount(){
+    let socketStatus:Boolean=webSocket.isConnected()
+    console.log(socketStatus)
+    webSocket.connect().then( res =>  {
+      this.hacerSubcripciones()
+    }).catch(error=>console.log(error));
+  }
+  upDateToken(){
+    return new Promise((resolve, reject) => {
+      LOCALSTORAGE.getIdUsuario().then(response=>{
+        console.log(response)
+        this.setState({idUsuario:response})
+        console.log(this.state.idUsuario)
+        resolve()
+      })
+    })
+  }
+  hacerSubcripciones(){
+    webSocket.unSubscribe('sub-1')
+    this.upDateToken().then(res => 
+      webSocket.subscribe('/topic/chat/'+this.state.idUsuario).then(res=>{
+        console.log(res)
+      }) 
+    );
   }
   //aqui se actualiza el indice basandose en la pantalla que se selecciono para navegar  
   switchScreen(index:number) {
@@ -60,9 +87,15 @@ class HomeScreen extends React.Component<Props,State> {
   }
   //cierra sesión, elimina los tokens del LS y te navega a la pantalla del login
   salir=()=>{
+    webSocket.unSubscribe('sub-0')
     LOCALSTORAGE.borrarSesion()
-    this.props.navigation.push("Login")
+    //this.props.navigation.push("Login")
     this.setState({index:3})
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: 'Login' })],
+    });
+    this.props.navigation.dispatch(resetAction);
   }
   //Aqui se muestra el footer y basandose en el indice que definimos para cada pantalla
   // te muestra la que corrsponda
