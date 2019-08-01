@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View,StyleSheet,FlatList,ImageBackground, Alert} from 'react-native'
 import api from '../api';
 import localstorage from '../localstorage';
-import { StackNavigator, NavigationScreenProp } from 'react-navigation';
+import { StackNavigator, NavigationScreenProp, StackActions, NavigationActions } from 'react-navigation';
 import { Container,Toast, Header, Title,Form, Left, Icon, Right, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input } from "native-base";
 import { Login } from '../entidades/login';
 import md5 from 'md5';
@@ -154,7 +154,12 @@ class LoginScreen extends React.Component<Props,state> {
     LOCALSTORAGE.setUsuario(usuario.toString())
     LOCALSTORAGE.setRefresh(refresh)
     LOCALSTORAGE.setIsAdmin(isAdmin.toString())
-    this.props.navigation.push("Home",{index:3,idUsuario:id.toString()})
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: 'Home' })],
+    });
+    this.props.navigation.dispatch(resetAction);
+    //this.props.navigation.push("Home",{index:3,idUsuario:id.toString()})
   }
   getUsuario(){
     console.log("entro");

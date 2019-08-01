@@ -5,6 +5,7 @@ import Stomp from 'stompjs'
 export default class SessionWebSocket {
     private static instance: SessionWebSocket;
     private session:any;
+    
     //private  suscriptions:any;
     private constructor() {
       // Crear el cliente de websocket puro
@@ -19,16 +20,13 @@ export default class SessionWebSocket {
        let stompClient =  Stomp;
        //stompClient.setMessageConverter(new MappingJackson2MessageConverter());
       //StompSessionHandler sessionHandler = new MyStompSessionHandler();
-       
+
        //String url = "ws://" + rutaUri +  ":" + RutasConexion.puertoRutaUri + "/connect";
-       
        // Crear los headers que se van a mandar para que el servidor acepte la conexion
        //WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
        //headers.add("tenantId", TENANT_ID);
        //headers.add("MacAddress", MyInterceptor.getMac());
        //headers.add("authorization", "Bearer " + TOKEN);
-       
-       // Conectarse
        this.session = stompClient.over(sockJsClient);
        //this.suscriptions = [];
     }
@@ -40,7 +38,7 @@ export default class SessionWebSocket {
       }
       return SessionWebSocket.instance;
     }
-    subscribe(topic:any) {
+    subscribe(topic:any,id:any) {
       return new Promise((resolve, reject) => {
       this.session.subscribe(topic, function (hello:any) {
         const incomingMessage:any = {
@@ -49,7 +47,7 @@ export default class SessionWebSocket {
           createdAt: new Date()
         }
         resolve(incomingMessage)
-        });
+        },{id});
       });
       //this.suscriptions.put(topic, suscription);
     }
@@ -65,18 +63,22 @@ export default class SessionWebSocket {
     }
     connect() {
       return new Promise((resolve, reject) => {
-      this.session.connect({}, function (frame:any) {resolve()},function(error:any){reject(error)}); 
+      this.session.connect({}, function (frame:any) {
+        resolve()
+      },function(error:any){
+        reject(error)
+        }); 
       });  
     }
 
      isConnected():Boolean {
-        return this.session.isConnected();
+        return this.session.connected;
     }
 
     getSessionId():String {
         return this.session.getSessionId();
     }
     disconnect() {
-        this.session.disconnect();
+      this.session.disconnect();
     }
   }

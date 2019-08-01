@@ -10,7 +10,6 @@
 import React, {Component} from 'react';
 import { Root } from "native-base";
 import {Platform, StyleSheet, Text, View} from 'react-native';
-import HomeScreen from './src/screens/MessagesScreen'
 //import DrawerNavigator from './src/navigation/DrawerNavigator'
 import MainNavigator from './src/navigation/MainNavigator';
 

@@ -19,11 +19,13 @@ interface State{
 }
 //variables globales
 let API = new api();
-let LOCALSTORAGE = new localstorage();
 let webSocket = SessionWebSocket.getInstance()
+let LOCALSTORAGE = new localstorage();
 class HomeScreen extends React.Component<Props,State> {
+  
   constructor(props: Props){
     super(props);
+    //console.log('entro')
     const indice = this.props.navigation.getParam('index');
       // el indice para la pantalla de inicio
     if(indice==undefined){
@@ -31,18 +33,23 @@ class HomeScreen extends React.Component<Props,State> {
     }else{
       this.state = {index: indice}
     }
-  }
-  componentDidMount(){
     let socketStatus:Boolean=webSocket.isConnected()
     console.log(socketStatus)
-    webSocket.connect().then( res =>  {
+    if(socketStatus==true){
       this.hacerSubcripciones()
-    }).catch(error=>console.log(error));
+    }else {
+      webSocket.connect().then( res =>  {
+        this.hacerSubcripciones()
+      }).catch(error=>console.log(error));
+    }
+  }
+  componentDidMount(){
+    
   }
   upDateToken(){
     return new Promise((resolve, reject) => {
       LOCALSTORAGE.getIdUsuario().then(response=>{
-        console.log(response)
+       // console.log(response)
         this.setState({idUsuario:response})
         console.log(this.state.idUsuario)
         resolve()
@@ -50,9 +57,9 @@ class HomeScreen extends React.Component<Props,State> {
     })
   }
   hacerSubcripciones(){
-    webSocket.unSubscribe('sub-1')
+    webSocket.unSubscribe('sub-chat')
     this.upDateToken().then(res => 
-      webSocket.subscribe('/topic/chat/'+this.state.idUsuario).then(res=>{
+      webSocket.subscribe('/topic/chat/'+this.state.idUsuario,'sub-inicio').then(res=>{
         console.log(res)
       }) 
     );
@@ -87,7 +94,8 @@ class HomeScreen extends React.Component<Props,State> {
   }
   //cierra sesión, elimina los tokens del LS y te navega a la pantalla del login
   salir=()=>{
-    webSocket.unSubscribe('sub-0')
+    webSocket.unSubscribe('sub-inicio')
+    //webSocket.disconnect()
     LOCALSTORAGE.borrarSesion()
     //this.props.navigation.push("Login")
     this.setState({index:3})

@@ -35,6 +35,7 @@ let idUsuario:string
 let config:any
 let idDestinatario:string
 let nomDestintario:string
+let mac : string
 let webSocket = SessionWebSocket.getInstance()
 class ChatScreen extends React.Component<Props,state> {
   private stompClient:any;
@@ -44,13 +45,13 @@ class ChatScreen extends React.Component<Props,state> {
       idDestinatario = this.props.navigation.getParam('idDestinatario');
       nomDestintario = this.props.navigation.getParam('nomDestinatario');
       console.log(idUsuario+' '+idDestinatario+' '+nomDestintario)
-      this.state = {
-        messages:[],idUsuario:idUsuario,idDestinatario:idDestinatario,nomDestintario:nomDestintario
-      }
       DeviceInfo.getMACAddress().then(mac => {
         // "E5:12:D8:E5:69:97"
-        this.setState({macADD:mac})
+        mac=mac
       });
+      this.state = {
+        messages:[],idUsuario:idUsuario,macADD:mac,idDestinatario:idDestinatario,nomDestintario:nomDestintario
+      }
       this.upDateToken().then(res => this.hacerSubscripcion())
     }
   
@@ -67,13 +68,27 @@ class ChatScreen extends React.Component<Props,state> {
       });
     }
     hacerSubscripcion(){
-      webSocket.unSubscribe('sub-0')
-      webSocket.subscribe('/topic/chat/1').then((res:any)=>{
-        console.log(res)
-        this.setState(previousState => ({
-          messages: GiftedChat.append(previousState.messages, res),
-        }));
-      })
+      let socketStatus:Boolean=webSocket.isConnected()
+      console.log(socketStatus)
+      if(socketStatus==true){
+        webSocket.unSubscribe('sub-inicio')
+        webSocket.subscribe('/topic/chat/'+idUsuario,'sub-chat').then((res:any)=>{
+          console.log(res)
+          this.setState(previousState => ({
+            messages: GiftedChat.append(previousState.messages, res),
+          }));
+        })
+      }else {
+        webSocket.connect().then( res =>  {
+          webSocket.unSubscribe('sub-inicio')
+          webSocket.subscribe('/topic/chat/'+idUsuario,'sub-chat').then((res:any)=>{
+            console.log(res)
+            this.setState(previousState => ({
+              messages: GiftedChat.append(previousState.messages, res),
+            }));
+          })
+        }).catch(error=>console.log(error));
+      }
     }
     componentWillMount() {
     }
@@ -173,6 +188,9 @@ class ChatScreen extends React.Component<Props,state> {
         );
       }
     }
+    regresar=()=>{
+      this.props.navigation.push('Home')
+    }
     render(){
           return (
             <Container>
@@ -182,7 +200,7 @@ class ChatScreen extends React.Component<Props,state> {
                       <Button
                         transparent
                         onPress={()=>
-                          this.props.navigation.push('Home')
+                          this.regresar()
                         }
                           >
                         <Icon type="Ionicons" name="ios-arrow-back" />

@@ -1,12 +1,12 @@
 import React from 'react'
-import {NavigationScreenProp } from 'react-navigation';
+import {NavigationScreenProp, StackActions, NavigationActions } from 'react-navigation';
 import localstorage from '../localstorage';
 import { Container,Spinner, Content, List,Footer,FooterTab, ListItem, Accordion, Button, Icon,Left,Right, Text, Item  } from "native-base";
 import AsyncStorage from '@react-native-community/async-storage';
 import { StyleSheet } from 'react-native';
 export interface Props {
-    navigation: NavigationScreenProp<any,any>,
-}
+  navigation: NavigationScreenProp<any,any>,
+  };
 interface State {
   sesion?: boolean;
 }
@@ -24,7 +24,23 @@ export default class LoadingScreen extends React.Component<Props,State>{
     }
     componentDidUpdate(){
       //si existe sesión se navegará al appStack que son las pantallas de la app y si no al authStack que es el login
-      this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
+      console.log(this.state.sesion)
+      if(this.state.sesion==true){
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({ routeName: 'Home' })],
+        });
+        this.props.navigation.dispatch(resetAction);
+        //this.props.navigation.navigate('Home');
+      }else{
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({ routeName: 'Login' })],
+        });
+        this.props.navigation.dispatch(resetAction);
+        //this.props.navigation.navigate('Login');
+      }
+      //this.props.navigation.navigate(this.state.sesion ? 'App' : 'Auth');
     }
     render(){
         return (
