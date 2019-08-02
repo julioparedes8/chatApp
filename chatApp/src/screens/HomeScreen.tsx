@@ -59,9 +59,14 @@ class HomeScreen extends React.Component<Props,State> {
   hacerSubcripciones(){
     webSocket.unSubscribe('sub-chat')
     this.upDateToken().then(res => 
-      webSocket.subscribe('/topic/chat/'+this.state.idUsuario,'sub-inicio').then(res=>{
+     {
+       webSocket.subscribe('/topic/chat/'+this.state.idUsuario,'sub-inicio').then(res=>{
         console.log(res)
       }) 
+      webSocket.subscribe('/topic/alertas/'+this.state.idUsuario,'sub-alertas').then(res=>{
+        console.log(res)
+      }) 
+    }
     );
   }
   //aqui se actualiza el indice basandose en la pantalla que se selecciono para navegar  
@@ -180,7 +185,7 @@ class HomeScreen extends React.Component<Props,State> {
           </Footer>
         </Container>
       )
-    }
+  }
 }
 const styles = StyleSheet.create({
   header: {

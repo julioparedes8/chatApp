@@ -74,8 +74,13 @@ class ChatScreen extends React.Component<Props,state> {
         webSocket.unSubscribe('sub-inicio')
         webSocket.subscribe('/topic/chat/'+idUsuario,'sub-chat').then((res:any)=>{
           console.log(res)
+          const incomingMessage:any = {
+            _id:(res.id),
+            text: (res.contenido),
+            createdAt: new Date()
+          }
           this.setState(previousState => ({
-            messages: GiftedChat.append(previousState.messages, res),
+            messages: GiftedChat.append(previousState.messages, incomingMessage),
           }));
         })
       }else {
@@ -83,8 +88,13 @@ class ChatScreen extends React.Component<Props,state> {
           webSocket.unSubscribe('sub-inicio')
           webSocket.subscribe('/topic/chat/'+idUsuario,'sub-chat').then((res:any)=>{
             console.log(res)
+            const incomingMessage:any = {
+              _id:(res.id),
+              text: (res.contenido),
+              createdAt: new Date()
+            }
             this.setState(previousState => ({
-              messages: GiftedChat.append(previousState.messages, res),
+              messages: GiftedChat.append(previousState.messages, incomingMessage),
             }));
           })
         }).catch(error=>console.log(error));
