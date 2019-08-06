@@ -9,6 +9,7 @@ import { StackNavigator, NavigationScreenProp } from 'react-navigation';
 import { Container, Header, Title, Left, Icon, Right,Footer,FooterTab, Button, Body,Item, Content,Text, Card, CardItem,Accordion,Input, List, ListItem, Thumbnail, Toast, Spinner } from "native-base";
 import SysAlerta from '../entidades/SysAlerta';
 import SysGrupoUsuario from '../entidades/SysGrupoUsuario';
+import SessionWebSocket from '../SessionWebSocket';
 var SQLite = require('react-native-sqlite-storage')
 let db:any
 export interface Props {
@@ -36,6 +37,7 @@ let config2={}
 let config3={}
 let token=""
 let refresh=""
+let webSocket = SessionWebSocket.getInstance()
 let alertas: any[]=[]
 class AlertaScreen extends React.Component<Props,State> {
     constructor(props: Props){
@@ -66,7 +68,43 @@ class AlertaScreen extends React.Component<Props,State> {
           console.log(error);
         }
       );
-      this.upDateToken()
+      this.upDateToken().then(res => this.hacerSubscripcion())
+    }
+    hacerSubscripcion(){
+      let socketStatus:Boolean=webSocket.isConnected()
+      console.log(socketStatus)
+      if(socketStatus==true){
+        webSocket.unSubscribe('sub-alertas')
+        webSocket.subscribe('/topic/alertas/'+this.state.id,'sub-alertas2').then((res:any)=>{
+          console.log(res)
+          if(res.prioridad=='ALTA'){
+            alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":1,"fecha":res.fecha})
+          }
+          if(res.prioridad=='MEDIA'){
+            alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":2,"fecha":res.fecha})
+          }
+          if(res.prioridad=='BAJA'){
+            alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":3,"fecha":res.fecha})
+          }
+          
+        })
+      }else {
+        webSocket.connect().then( res =>  {
+          webSocket.unSubscribe('sub-alertas')
+          webSocket.subscribe('/topic/alertas/'+this.state.id,'sub-alertas2').then((res:any)=>{
+            console.log(res)
+            if(res.prioridad=='ALTA'){
+              this.state.alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":1,"fecha":res.fecha})
+            }
+            if(res.prioridad=='MEDIA'){
+              this.state.alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":2,"fecha":res.fecha})
+            }
+            if(res.prioridad=='BAJA'){
+              this.state.alertas.push({"key":res.id,"titulo":res.titulo,"detalle":res.detalles,"prioridad":res.prioridad,"numPriori":3,"fecha":res.fecha})
+            }
+          })
+        }).catch(error=>console.log(error));
+      }
     }
     async componentWillMount() {
       db.transaction((tx: { executeSql: (arg0: string) => void; }) => {

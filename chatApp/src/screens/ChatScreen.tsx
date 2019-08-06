@@ -38,7 +38,7 @@ let nomDestintario:string
 let mac : string
 let webSocket = SessionWebSocket.getInstance()
 class ChatScreen extends React.Component<Props,state> {
-  private stompClient:any;
+  //private stompClient:any;
     constructor(props: Props){
       super(props);
       idUsuario = this.props.navigation.getParam('idUsuario');
